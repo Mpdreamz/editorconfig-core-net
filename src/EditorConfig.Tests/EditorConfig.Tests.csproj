@@ -1,30 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFrameworks>netcoreapp2.0</TargetFrameworks>
-		<IsTestProject>True</IsTestProject>
-	</PropertyGroup>
-	
-	<ItemGroup>
-		<ProjectReference Include="..\EditorConfig.Core\EditorConfig.Core.csproj" />
-		<PackageReference Include="FluentAssertions" Version="5.6.0" />
-		<PackageReference Include="NUnit" Version="3.11.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
-	</ItemGroup>
-	
-	<ItemGroup>
-		<None Include="*\*.editorconfig">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Include="StopAtRoot\X\*.editorconfig">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Include="StopAtRoot\X\Y\Z\*.editorconfig">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Include="StopAtRoot\X\Y\*.editorconfig">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsTestProject>True</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="3.2.1" />
+    <PackageReference Include="NUnit" Version="2.6.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EditorConfig.Core\EditorConfig.Core.csproj" />
+    <PackageReference Include="FluentAssertions" Version="5.6.0" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="*\*.editorconfig">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="StopAtRoot\X\*.editorconfig">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="StopAtRoot\X\Y\Z\*.editorconfig">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="StopAtRoot\X\Y\*.editorconfig">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

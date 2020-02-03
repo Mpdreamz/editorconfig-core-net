@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFrameworks>net40;netcoreapp2.0</TargetFrameworks>
-		<AssemblyName>editorconfig</AssemblyName>
-		<ProjectType>Exe</ProjectType>
-		<Version>0.12.1</Version>
-		<Description>A .NET implementation of the editorconfig tooling</Description>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\EditorConfig.Core\EditorConfig.Core.csproj" />
-	</ItemGroup>
-
+  <PropertyGroup>
+    <TargetFrameworks>net40;netcoreapp2.0</TargetFrameworks>
+    <AssemblyName>editorconfig</AssemblyName>
+    <ProjectType>Exe</ProjectType>
+    <Version>0.12.1</Version>
+    <Description>A .NET implementation of the editorconfig tooling</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EditorConfig.Core\EditorConfig.Core.csproj" />
+  </ItemGroup>
 </Project>
