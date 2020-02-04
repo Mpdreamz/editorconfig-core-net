@@ -3,8 +3,8 @@
     <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>editorconfig</AssemblyName>
     <ProjectType>Exe</ProjectType>
-    <Version>0.12.1</Version>
     <Description>A .NET implementation of the editorconfig tooling</Description>
+	<IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">

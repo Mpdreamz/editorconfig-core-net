@@ -1,6 +1,5 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
+# Visual Studio Version 16
 VisualStudioVersion = 16.0.27903.4000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EditorConfig.Core", "src\EditorConfig.Core\EditorConfig.Core.csproj", "{C33CF791-89D0-4ABE-B2B7-97E1F46A1319}"
@@ -12,14 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.bat = build.bat
 		build\build.fsx = build\build.fsx
 		build\chocolatey.nuspec = build\chocolatey.nuspec
-		build\nuget.nuspec = build\nuget.nuspec
 		README.md = README.md
 		sign.snk = sign.snk
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorConfig.App", "src\EditorConfig.App\EditorConfig.App.csproj", "{D7CD5DEF-002E-4463-9FE8-AC6676DAA36C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EditorConfig.App", "src\EditorConfig.App\EditorConfig.App.csproj", "{D7CD5DEF-002E-4463-9FE8-AC6676DAA36C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorConfig.Tests", "src\EditorConfig.Tests\EditorConfig.Tests.csproj", "{F65280C8-E47C-48D1-B99A-33CB4C594FCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EditorConfig.Tests", "src\EditorConfig.Tests\EditorConfig.Tests.csproj", "{F65280C8-E47C-48D1-B99A-33CB4C594FCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

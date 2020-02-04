@@ -2,11 +2,10 @@
 
   <PropertyGroup>
     <Description>Editorconfig library for .NET</Description>
-    <VersionPrefix>0.12.1</VersionPrefix>
-    <Authors>Editorconfig Team</Authors>
+    <Authors>Editorconfig Team, StarkBIM</Authors>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <AssemblyName>EditorConfig.Core</AssemblyName>
-    <PackageId>EditorConfig.Core</PackageId>
+    <PackageId>EditorConfig</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
