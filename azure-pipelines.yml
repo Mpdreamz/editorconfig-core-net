@@ -7,7 +7,7 @@ resources:
     - repository: templates
       type: git
       name: StarkBIM.Build/StarkBIM.Build
-      ref: refs/tags/0.2.71+gcf6587c3ea
+      ref: refs/tags/0.2.71+cf6587c3ea
 
 jobs:
 - template: Azure/azure-pipelines.yml@templates  # Template reference
