@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
-    <AssemblyName>editorconfig</AssemblyName>
+    <AssemblyName>editorconfig.tool</AssemblyName>
     <ProjectType>Exe</ProjectType>
     <Description>A .NET implementation of the editorconfig tooling</Description>
 	<IsPackable>false</IsPackable>
