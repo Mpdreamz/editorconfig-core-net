@@ -7,6 +7,12 @@
     <Description>A .NET implementation of the editorconfig tooling</Description>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\EditorConfig.Core\EditorConfig.Core.csproj" />
   </ItemGroup>
 </Project>
