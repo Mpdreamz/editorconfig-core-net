@@ -13,3 +13,4 @@ jobs:
 - template: Azure/azure-pipelines.yml@templates  # Template reference
   parameters:
     publishNuGet: 'true'
+    vmImage: 'windows-latest'
