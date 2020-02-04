@@ -12,13 +12,15 @@ const string Project = "EditorConfig";
 
 // Run this before configuring projects
 // Certain properties like IsDebug must be set first
-BuildParameters.Initialize(Context, BuildSystem, Project);
+BuildParameters.Initialize(Context, BuildSystem, Project, directorySettings: new DirectorySettings(Context, testDirectory: "./src"));
 
 ///////////////////////////////////////////////////////////////////////////////
 // TARGETS
 ///////////////////////////////////////////////////////////////////////////////
 
 // Add any project-specific targets here
+
+BuildParameters.ConfigureProjects(unitTestFilter: @"\**\*.Tests.csproj");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
