@@ -5,12 +5,12 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.StopAtRoot
 {
 	[TestFixture]
-	class StopsAtRootTests : EditorConfigTestBase
+	internal class StopsAtRootTests : EditorConfigTestBase
 	{
 		[Test]
 		public void SomeProp_HasValueFromClosestConfig()
 		{
-			var file = this.GetConfig(MethodBase.GetCurrentMethod(), @"x\y\z\f.x");
+			var file = GetConfig(MethodBase.GetCurrentMethod(), @"x\y\z\f.x");
 			file.Properties.Should().NotBeEmpty().And.ContainKey("some_prop");
 			var someProp = file.Properties["some_prop"];
 			someProp.Should().Be("z");
@@ -19,14 +19,14 @@ namespace EditorConfig.Tests.StopAtRoot
 		[Test]
 		public void ParentsFromRootDoNotLeakIntoScope()
 		{
-			var file = this.GetConfig(MethodBase.GetCurrentMethod(), @"x\y\z\f.x");
+			var file = GetConfig(MethodBase.GetCurrentMethod(), @"x\y\z\f.x");
 			file.Properties.Should().NotBeEmpty().And.NotContainKey("outer_prop");
 		}
-		
+
 		[Test]
 		public void ChildrenDoNotInterfere()
 		{
-			var file = this.GetConfig(MethodBase.GetCurrentMethod(), @"x\f.x");
+			var file = GetConfig(MethodBase.GetCurrentMethod(), @"x\f.x");
 			file.Properties.Should().NotBeEmpty().And.ContainKey("outer_prop");
 			file.Properties.Should().NotBeEmpty().And.ContainKey("some_prop");
 			var someProp = file.Properties["some_prop"];

@@ -21,7 +21,7 @@ namespace EditorConfig.Core
   {
     ///<summary>Suppresses the behavior of treating # at the start of a pattern as a comment.</summary>
     public bool NoComment { get; set; }
-  
+
     ///<summary>Suppresses the behavior of treating a leading ! character as negation.</summary>
     public bool NoNegate { get; set; }
 
@@ -49,20 +49,20 @@ namespace EditorConfig.Core
 
     ///<summary>If true, backslahes in paths will be treated as forward slashes.</summary>
     public bool AllowWindowsPaths { get; set; }
-    
+
     ///<summary>If true, backslahes in patterns will be treated as forward slashes. This disables escape characters.</summary>
     public bool AllowWindowsPathsInPatterns { get; set; }
   }
-  
+
   // ReSharper restore UnusedAutoPropertyAccessor.Global
-  
-  public class GlobMatcher
+
+  public sealed class GlobMatcher
   {
     private readonly GlobMatcherOptions myOptions;
-    private readonly List<PatternCase>  mySet;
-    private readonly bool               myNegate;
-    private readonly bool               myComment;
-    private readonly bool               myEmpty;
+    private readonly List<PatternCase> mySet;
+    private readonly bool myNegate;
+    private readonly bool myComment;
+    private readonly bool myEmpty;
 
     private GlobMatcher(GlobMatcherOptions options, List<PatternCase> parsedPatternSet = null, bool negate = false, bool comment = false, bool empty = false)
     {
@@ -74,15 +74,22 @@ namespace EditorConfig.Core
     }
 
     private static readonly char[] ourUnixPathSeparators = { '/' };
-    private static readonly char[] ourWinPathSeparators  = { '/', '\\' };
+    private static readonly char[] ourWinPathSeparators = { '/', '\\' };
 
     ///<summary>Checks whether a given string matches this pattern.</summary>
     public bool IsMatch(string input)
     {
       // short-circuit in the case of busted things.
       // comments, etc.
-      if (myComment) return false;
-      if (myEmpty) return input == "";
+      if (myComment)
+      {
+        return false;
+      }
+
+      if (myEmpty)
+      {
+        return input?.Length == 0;
+      }
 
       // just ONE of the pattern sets in this.set needs to match
       // in order for it to be valid.  If negating, then just one
@@ -94,33 +101,39 @@ namespace EditorConfig.Core
         var hit = new MatchContext(myOptions, input, pattern).MatchOne();
         if (hit)
         {
-          if (myOptions.FlipNegate) return true;
-          
+          if (myOptions.FlipNegate)
+          {
+            return true;
+          }
+
           return !myNegate;
         }
       }
 
       // didn't get any hits.  this is success if it's a negative
       // pattern, failure otherwise.
-      if (myOptions.FlipNegate) return false;
-      
+      if (myOptions.FlipNegate)
+      {
+        return false;
+      }
+
       return myNegate;
     }
 
-    struct MatchContext
+    private struct MatchContext
     {
       private readonly GlobMatcherOptions myOptions;
-      private readonly PatternCase        myPatternCase;
-      private readonly string             myStr;
-      private          int                myStartOffset;
-      private          int                myEndOffset;
-      private          int                myStartItem;
-      private          int                myEndItem;
-      private          int                myLastAsteriskItem;
-      private          int                myNextPositionForAsterisk;
+      private readonly PatternCase myPatternCase;
+      private readonly string myStr;
+      private int myStartOffset;
+      private int myEndOffset;
+      private int myStartItem;
+      private int myEndItem;
+      private int myLastAsteriskItem;
+      private int myNextPositionForAsterisk;
 
-      private StringComparison ComparisonType     => myOptions.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-      private char[]           PathSeparatorChars => myOptions.AllowWindowsPaths ? ourWinPathSeparators : ourUnixPathSeparators;
+      private StringComparison ComparisonType => myOptions.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+      private char[] PathSeparatorChars => myOptions.AllowWindowsPaths ? ourWinPathSeparators : ourUnixPathSeparators;
 
       public MatchContext(GlobMatcherOptions options, string str, PatternCase patternCase)
       {
@@ -158,8 +171,15 @@ namespace EditorConfig.Core
           myEndItem = oldEndItem;
           myEndOffset = oldEndOffset;
           // file a/b/ should match pattern a/b, so let's try again without trailing /
-          if (!SkipLastPathSeparators()) return false;
-          if (!MatchOneBackwards()) return false;
+          if (!SkipLastPathSeparators())
+          {
+            return false;
+          }
+
+          if (!MatchOneBackwards())
+          {
+            return false;
+          }
         }
 
         return MatchOneForward();
@@ -177,10 +197,16 @@ namespace EditorConfig.Core
               return true;
 
             case Literal literal:
-              if (myEndOffset - myStartOffset < literal.Source.Length) return false; // Not enough chars
+              if (myEndOffset - myStartOffset < literal.Source.Length)
+              {
+                return false; // Not enough chars
+              }
 
               int pos = myStr.LastIndexOf(literal.Source, myEndOffset - 1, literal.Source.Length, ComparisonType);
-              if (pos == -1) return false;
+              if (pos == -1)
+              {
+                return false;
+              }
 
               myEndOffset = pos;
               break;
@@ -189,31 +215,50 @@ namespace EditorConfig.Core
               if (myStartItem <= myEndItem - 1)
               {
                 // If we have pattern like a/**/b, then it should be matched by a/b, so don't eat path separator after **
-                if (myPatternCase[myEndItem - 1] is DoubleAsterisk) return true;
+                if (myPatternCase[myEndItem - 1] is DoubleAsterisk)
+                {
+                  return true;
+                }
               }
 
-              if (myEndOffset - myStartOffset < 1) return false; // Not enough chars
+              if (myEndOffset - myStartOffset < 1)
+              {
+                return false; // Not enough chars
+              }
 
-              if (!IsPathSeparator(myOptions, myStr[myEndOffset - 1])) return false;
+              if (!IsPathSeparator(myOptions, myStr[myEndOffset - 1]))
+              {
+                return false;
+              }
 
-              while (true)
+              do
               {
                 myEndOffset--;
-                if (myEndOffset - myStartOffset < 1) break;
-                if (!IsPathSeparator(myOptions, myStr[myEndOffset - 1])) break;
+                if (myEndOffset - myStartOffset < 1)
+                {
+                  break;
+                }
               }
+              while (IsPathSeparator(myOptions, myStr[myEndOffset - 1]));
 
               break;
 
             case OneChar oneCharParseItem:
-              if (myEndOffset - myStartOffset < 1) return false; // Not enough chars
-              if (!oneCharParseItem.CheckChar(myOptions, myStr[myEndOffset - 1], ComparisonType)) return false;
+              if (myEndOffset - myStartOffset < 1)
+              {
+                return false; // Not enough chars
+              }
+
+              if (!oneCharParseItem.CheckChar(myOptions, myStr[myEndOffset - 1], ComparisonType))
+              {
+                return false;
+              }
 
               myEndOffset--;
               break;
 
             default:
-              Debug.Assert(false, "Unknown item");
+              Debug.Fail("Unknown item");
               break;
           }
 
@@ -245,7 +290,10 @@ namespace EditorConfig.Core
           switch (item)
           {
             case Asterisk asterisk:
-              if (myStartItem == myEndItem) return CheckMatchedByAsterisk(asterisk, true, myStartOffset, myEndOffset); // Last asterisk just matches everything
+              if (myStartItem == myEndItem)
+              {
+                return CheckMatchedByAsterisk(asterisk, true, myStartOffset, myEndOffset); // Last asterisk just matches everything
+              }
 
               // Suppose we have two asterisks in a pattern, so pattern looks like this:
               // <part1>*<part2>*<part3>
@@ -271,7 +319,10 @@ namespace EditorConfig.Core
 
               if (!(item is DoubleAsterisk) || !(asterisk.NextAsterisk is SimpleAsterisk))
               {
-                if (!GotoNextPositionForAsterisk(true)) return false;
+                if (!GotoNextPositionForAsterisk(true))
+                {
+                  return false;
+                }
 
                 break;
               }
@@ -299,13 +350,19 @@ namespace EditorConfig.Core
               while (true)
               {
                 myStartItem = myLastAsteriskItem + 1;
-                if (!GotoNextPositionForAsterisk(first)) return false;
+                if (!GotoNextPositionForAsterisk(first))
+                {
+                  return false;
+                }
 
                 var oldNextPositionForAsterisk = myNextPositionForAsterisk;
                 myLastAsteriskItem = -1;
                 myNextPositionForAsterisk = -1;
-                if (MatchOneForward()) return true;
-                
+                if (MatchOneForward())
+                {
+                  return true;
+                }
+
                 myLastAsteriskItem = oldLastAsteriskItem;
                 myNextPositionForAsterisk = oldNextPositionForAsterisk;
 
@@ -314,41 +371,65 @@ namespace EditorConfig.Core
               }
 
             case PathSeparator _:
-              if (myEndOffset - myStartOffset < 1) return false; // Not enough chars
+              if (myEndOffset - myStartOffset < 1)
+              {
+                return false; // Not enough chars
+              }
 
-              if (!IsPathSeparator(myOptions, myStr[myStartOffset])) goto Mismatch;
+              if (!IsPathSeparator(myOptions, myStr[myStartOffset]))
+              {
+                goto Mismatch;
+              }
 
-              while (true)
+              do
               {
                 myStartOffset++;
-                if (myEndOffset - myStartOffset < 1) break;
-                if (!IsPathSeparator(myOptions, myStr[myStartOffset])) break;
+                if (myEndOffset - myStartOffset < 1)
+                {
+                  break;
+                }
               }
+              while (IsPathSeparator(myOptions, myStr[myStartOffset]));
 
               break;
 
             case Literal literal:
-              if (myEndOffset - myStartOffset < literal.Source.Length) return false; // Not enough chars
+              if (myEndOffset - myStartOffset < literal.Source.Length)
+              {
+                return false; // Not enough chars
+              }
 
               int pos = myStr.IndexOf(literal.Source, myStartOffset, literal.Source.Length, ComparisonType);
-              if (pos == -1) goto Mismatch;
+              if (pos == -1)
+              {
+                goto Mismatch;
+              }
 
               myStartOffset = pos + literal.Source.Length;
               break;
 
             case OneChar oneChar:
-              if (myEndOffset - myStartOffset < 1) return false; // Not enough chars
+              if (myEndOffset - myStartOffset < 1)
+              {
+                return false; // Not enough chars
+              }
 
               char c = myStr[myStartOffset];
-              if (!oneChar.CheckChar(myOptions, c, ComparisonType)) goto Mismatch;
+              if (!oneChar.CheckChar(myOptions, c, ComparisonType))
+              {
+                goto Mismatch;
+              }
 
-              if (c == '.' && !CheckDot(myStartOffset)) goto Mismatch;
+              if (c == '.' && !CheckDot(myStartOffset))
+              {
+                goto Mismatch;
+              }
 
               myStartOffset++;
               break;
 
             default:
-              Debug.Assert(false, "Unknown item");
+              Debug.Fail("Unknown item");
               break;
           }
 
@@ -366,31 +447,43 @@ namespace EditorConfig.Core
               SkipLastPathSeparators();
             }
 
-            if (myEndOffset - myStartOffset > 0) goto Mismatch;
+            if (myEndOffset - myStartOffset > 0)
+            {
+              goto Mismatch;
+            }
 
             return true;
           }
 
           continue;
 
-          Mismatch:
-          if (myLastAsteriskItem == -1) return false;
+        Mismatch:
+          if (myLastAsteriskItem == -1)
+          {
+            return false;
+          }
 
           myStartItem = myLastAsteriskItem + 1;
           myStartOffset = myNextPositionForAsterisk;
 
-          if (!GotoNextPositionForAsterisk(false)) return false;
+          if (!GotoNextPositionForAsterisk(false))
+          {
+            return false;
+          }
         }
 
         return myEndOffset - myStartOffset <= 0;
       }
 
-      bool GotoNextPositionForAsterisk(bool first)
+      private bool GotoNextPositionForAsterisk(bool first)
       {
         Debug.Assert(myLastAsteriskItem >= 0 && myLastAsteriskItem < myPatternCase.Count, "lastAsteriskItem >= 0 && lastAsteriskItem < patternCase.Count");
-        var asterisk = (Asterisk) myPatternCase[myLastAsteriskItem];
+        var asterisk = (Asterisk)myPatternCase[myLastAsteriskItem];
         int fixedItemsLengthAfterAsterisk = asterisk.FixedItemsLengthAfterAsterisk;
-        if (myEndOffset - myStartOffset < fixedItemsLengthAfterAsterisk) return false;
+        if (myEndOffset - myStartOffset < fixedItemsLengthAfterAsterisk)
+        {
+          return false;
+        }
 
         var oldStartPos = myStartOffset;
 
@@ -401,10 +494,16 @@ namespace EditorConfig.Core
           if (myPatternCase[literalAfterAsterisk] is Literal literal)
           {
             int pos = myStr.IndexOf(literal.Source, myStartOffset + numberOfOneCharItemsBefore, myEndOffset - myStartOffset - numberOfOneCharItemsBefore, ComparisonType);
-            if (pos == -1) return false;
+            if (pos == -1)
+            {
+              return false;
+            }
 
             myStartOffset = pos - numberOfOneCharItemsBefore;
-            if (myEndOffset - myStartOffset < fixedItemsLengthAfterAsterisk) return false;
+            if (myEndOffset - myStartOffset < fixedItemsLengthAfterAsterisk)
+            {
+              return false;
+            }
           }
           else
           {
@@ -420,22 +519,31 @@ namespace EditorConfig.Core
             }
 
             int pos = myStr.IndexOfAny(PathSeparatorChars, myStartOffset + numberOfOneCharItemsBefore, myEndOffset - myStartOffset - numberOfOneCharItemsBefore);
-            if (pos == -1) return false;
+            if (pos == -1)
+            {
+              return false;
+            }
 
             myStartOffset = pos - numberOfOneCharItemsBefore;
-            if (myEndOffset - myStartOffset < fixedItemsLengthAfterAsterisk) return false;
+            if (myEndOffset - myStartOffset < fixedItemsLengthAfterAsterisk)
+            {
+              return false;
+            }
           }
         }
 
         int newStartPos = myStartOffset;
 
-        if (!CheckMatchedByAsterisk(asterisk, first, oldStartPos, newStartPos)) return false;
+        if (!CheckMatchedByAsterisk(asterisk, first, oldStartPos, newStartPos))
+        {
+          return false;
+        }
 
         myNextPositionForAsterisk = myStartOffset + 1;
         return true;
       }
 
-      bool CheckMatchedByAsterisk(Asterisk asteriskItem, bool first, int oldStartPos, int newStartPos)
+      private bool CheckMatchedByAsterisk(Asterisk asteriskItem, bool first, int oldStartPos, int newStartPos)
       {
         if (asteriskItem is SimpleAsterisk)
         {
@@ -445,14 +553,23 @@ namespace EditorConfig.Core
 
             bool atStart = newStartPos == 0 || IsPathSeparator(myOptions, myStr[newStartPos - 1]);
             bool atEnd = newStartPos == myStr.Length || IsPathSeparator(myOptions, myStr[newStartPos]);
-            if (atStart && atEnd) return false;
+            if (atStart && atEnd)
+            {
+              return false;
+            }
           }
 
           if (newStartPos > oldStartPos)
           {
-            if (myStr.IndexOfAny(PathSeparatorChars, oldStartPos, newStartPos - oldStartPos) != -1) return false;
+            if (myStr.IndexOfAny(PathSeparatorChars, oldStartPos, newStartPos - oldStartPos) != -1)
+            {
+              return false;
+            }
 
-            if (first && myStr[oldStartPos] == '.' && !CheckDot(oldStartPos)) return false;
+            if (first && myStr[oldStartPos] == '.' && !CheckDot(oldStartPos))
+            {
+              return false;
+            }
           }
         }
 
@@ -469,13 +586,16 @@ namespace EditorConfig.Core
           var dotPos = myStr.IndexOf('.', oldStartPos, length);
           if (dotPos != -1)
           {
-            if (!CheckDot(dotPos)) return false;
+            if (!CheckDot(dotPos))
+            {
+              return false;
+            }
           }
         }
 
         return true;
       }
-      
+
       private bool CheckDot(int dotPos)
       {
         // .x should not match neither *x, nor **x, nor ?x, unless
@@ -484,28 +604,53 @@ namespace EditorConfig.Core
         // exponential reasons.
         // also **.* should not match /., /.. and /.x (unless myOptions.Dot is set)
 
-        if (dotPos != 0 && !IsPathSeparator(myOptions, myStr[dotPos - 1])) return true; // ok, dot is in the middle of file/directory name
-        if (!myOptions.Dot) return false;                                             // implicit dot at the beginning is prohibited
+        if (dotPos != 0 && !IsPathSeparator(myOptions, myStr[dotPos - 1]))
+        {
+          return true; // ok, dot is in the middle of file/directory name
+        }
 
-        if (dotPos == myStr.Length - 1) return false;                    // file name is ".", prohibited
-        if (IsPathSeparator(myOptions, myStr[dotPos + 1])) return false; // directory name is ".", prohibited
-        if (myStr[dotPos + 1] != '.') return true;                       // it's not "..", allow this
-        if (dotPos + 1 == myStr.Length - 1) return false;                // file name is "..", prohibited
-        if (IsPathSeparator(myOptions, myStr[dotPos + 2])) return false; // directory name is "..", prohibited
+        if (!myOptions.Dot)
+        {
+          return false;                                             // implicit dot at the beginning is prohibited
+        }
+
+        if (dotPos == myStr.Length - 1)
+        {
+          return false;                    // file name is ".", prohibited
+        }
+
+        if (IsPathSeparator(myOptions, myStr[dotPos + 1]))
+        {
+          return false; // directory name is ".", prohibited
+        }
+
+        if (myStr[dotPos + 1] != '.')
+        {
+          return true;                       // it's not "..", allow this
+        }
+
+        if (dotPos + 1 == myStr.Length - 1)
+        {
+          return false;                // file name is "..", prohibited
+        }
+
+        if (IsPathSeparator(myOptions, myStr[dotPos + 2]))
+        {
+          return false; // directory name is "..", prohibited
+        }
 
         return true; // just a file/directory name that starts with "..", allow this
       }
     }
-    
-    static bool IsPathSeparator(GlobMatcherOptions options, char c)
+
+    private static bool IsPathSeparator(GlobMatcherOptions options, char c)
     {
       // windows: need to use /, not \
       // On other platforms, \ is a valid (albeit bad) filename char.
-      return c == '/' || options.AllowWindowsPaths && c == '\\';
+      return c == '/' || (options.AllowWindowsPaths && c == '\\');
     }
 
-
-    class PatternCase : List<IPatternElement>
+    private class PatternCase : List<IPatternElement>
     {
       public bool HasPathSeparators { get; private set; }
 
@@ -521,11 +666,11 @@ namespace EditorConfig.Core
           {
             HasPathSeparators = true;
           }
-          
+
           switch (item)
           {
             case Literal literal:
-              if (lastAsterisk != null && lastAsterisk.LiteralAfterAsterisk == -1)
+              if (lastAsterisk?.LiteralAfterAsterisk == -1)
               {
                 lastAsterisk.LiteralAfterAsterisk = i;
               }
@@ -534,7 +679,7 @@ namespace EditorConfig.Core
               break;
 
             case PathSeparator _:
-              if (lastAsterisk != null && lastAsterisk.LiteralAfterAsterisk == -1)
+              if (lastAsterisk?.LiteralAfterAsterisk == -1)
               {
                 lastAsterisk.LiteralAfterAsterisk = i;
               }
@@ -542,13 +687,13 @@ namespace EditorConfig.Core
               // First slash after ** could be skipped
               if (!(lastAsterisk is DoubleAsterisk) || fixedItemsLength > 0)
               {
-                fixedItemsLength += 1;
+                fixedItemsLength++;
               }
 
               break;
 
             case OneChar _:
-              fixedItemsLength += 1;
+              fixedItemsLength++;
               break;
 
             case Asterisk item1:
@@ -566,11 +711,11 @@ namespace EditorConfig.Core
       }
     }
 
-    interface IPatternElement
+    private interface IPatternElement
     {
     }
 
-    class Literal : IPatternElement
+    private class Literal : IPatternElement
     {
       public Literal(string source)
       {
@@ -580,7 +725,7 @@ namespace EditorConfig.Core
       public string Source { get; }
     }
 
-    class OneChar : IPatternElement
+    private class OneChar : IPatternElement
     {
       static OneChar() { }
       public static readonly OneChar EmptyInstance = new OneChar(null, false);
@@ -596,8 +741,11 @@ namespace EditorConfig.Core
 
       public bool CheckChar(GlobMatcherOptions options, char c, StringComparison comparison)
       {
-        if (IsPathSeparator(options, c)) return false;
-        
+        if (IsPathSeparator(options, c))
+        {
+          return false;
+        }
+
         if (PossibleChars != null)
         {
           return (PossibleChars.IndexOf(c.ToString(), comparison) != -1) != Negate;
@@ -607,44 +755,49 @@ namespace EditorConfig.Core
       }
     }
 
-    abstract class Asterisk : IPatternElement
+    private abstract class Asterisk : IPatternElement
     {
-      public Asterisk NextAsterisk                  { get; set; }
-      public int      LiteralAfterAsterisk          { get; set; } = -1;
-      public int      FixedItemsLengthAfterAsterisk { get; set; }
+      public Asterisk NextAsterisk { get; set; }
+      public int LiteralAfterAsterisk { get; set; } = -1;
+      public int FixedItemsLengthAfterAsterisk { get; set; }
     }
 
-    class SimpleAsterisk : Asterisk
-    {
-    }
-
-    class DoubleAsterisk : Asterisk
+    private class SimpleAsterisk : Asterisk
     {
     }
 
-    class PathSeparator : IPatternElement
+    private class DoubleAsterisk : Asterisk
+    {
+    }
+
+    private class PathSeparator : IPatternElement
     {
       private PathSeparator() { }
       static PathSeparator() { }
       public static readonly PathSeparator Instance = new PathSeparator();
-    } 
+    }
 
     ///<summary>Creates a new GlobMatcher instance, parsing the pattern into a regex.</summary>
     public static GlobMatcher Create(string pattern, GlobMatcherOptions options = null)
     {
-      if (pattern == null) throw new ArgumentNullException(nameof(pattern));
-      
+      if (pattern == null)
+      {
+        throw new ArgumentNullException(nameof(pattern));
+      }
+
       options = options ?? new GlobMatcherOptions();
       pattern = pattern.Trim();
       if (options.AllowWindowsPathsInPatterns)
+      {
         pattern = pattern.Replace('\\', '/');
-      
+      }
+
       // empty patterns and comments match nothing.
       if (!options.NoComment && !string.IsNullOrEmpty(pattern) && pattern[0] == '#')
       {
         return new GlobMatcher(options, comment: true);
       }
-      
+
       if (String.IsNullOrEmpty(pattern))
       {
         return new GlobMatcher(options, empty: true);
@@ -670,11 +823,14 @@ namespace EditorConfig.Core
       foreach (var g in globSet)
       {
         var parsedSet = Parse(options, g);
-        if (parsedSet == null) goto nextG;
-        
+        if (parsedSet == null)
+        {
+          goto nextG;
+        }
+
         list1.Add(parsedSet);
 
-        nextG:;
+      nextG:;
       }
 
       return new GlobMatcher(options, list1, negate);
@@ -684,17 +840,23 @@ namespace EditorConfig.Core
     {
       var negateOffset = 0;
 
-      if (options.NoNegate) return false;
+      if (options.NoNegate)
+      {
+        return false;
+      }
 
       bool negate = false;
-      
+
       for (var i = 0; i < pattern.Length && pattern[i] == '!'; i++)
       {
         negate = !negate;
         negateOffset++;
       }
 
-      if (negateOffset > 0) pattern = pattern.Substring(negateOffset);
+      if (negateOffset > 0)
+      {
+        pattern = pattern.Substring(negateOffset);
+      }
 
       return negate;
     }
@@ -721,10 +883,10 @@ namespace EditorConfig.Core
         // shortcut. no need to expand.
         return new[] { pattern };
       }
-      
+
       bool escaping = false;
       int i;
-      
+
       // examples and comments refer to this crazy pattern:
       // a{b,c{d,e},{f,g}h}x{y,z}
       // expected:
@@ -803,7 +965,7 @@ namespace EditorConfig.Core
             retVal.Add(w.ToString() + t);
           }
         }
-        
+
         return retVal;
       }
 
@@ -866,7 +1028,7 @@ namespace EditorConfig.Core
               {
                 member += c;
               }
-              
+
               continue;
 
             default:
@@ -890,7 +1052,11 @@ namespace EditorConfig.Core
       var addBraces = set.Count == 1;
 
       var set1 = new List<string>(set.Count);
-      foreach (string p in set) set1.AddRange(BraceExpand(p, options));
+      foreach (string p in set)
+      {
+        set1.AddRange(BraceExpand(p, options));
+      }
+
       set = set1;
 
       if (addBraces)
@@ -911,20 +1077,25 @@ namespace EditorConfig.Core
       {
         string s1 = s2[index];
         foreach (string s in set)
+        {
           list1.Add(s + s1);
+        }
       }
 
       return list1;
     }
-    
+
     // parse a component of the expanded set.
     private static PatternCase Parse(GlobMatcherOptions options, string pattern)
     {
-      if (pattern == "") return new PatternCase();
+      if (pattern?.Length == 0)
+      {
+        return new PatternCase();
+      }
 
       var result = new PatternCase();
       var sb = new StringBuilder();
-      
+
       bool escaping = false, inClass = false, negate = false, range = false;
       int classStart = -1;
 
@@ -944,7 +1115,7 @@ namespace EditorConfig.Core
         {
           char firstChar = sb[sb.Length - 1];
           firstChar++;
-          
+
           for (char c2 = firstChar; c2 <= c1; c2++)
           {
             sb.Append(c2);
@@ -986,7 +1157,7 @@ namespace EditorConfig.Core
                   sb.Append('\\');
                   escaping = false;
                 }
-                
+
                 FinishLiteral();
 
                 if (!(result.LastOrDefault() is PathSeparator))
@@ -994,7 +1165,7 @@ namespace EditorConfig.Core
                   result.Add(PathSeparator.Instance);
                 }
               }
-              
+
               break;
 
             case '\\':
@@ -1072,14 +1243,17 @@ namespace EditorConfig.Core
               //  meaning and represent itself in
               //  a bracket expression if it occurs
               //  first in the list.  -- POSIX.2 2.8.3.2
-              if (i == classStart + 1 || negate && i == classStart + 2 || !inClass)
+              if (i == classStart + 1 || (negate && i == classStart + 2) || !inClass)
               {
                 AppendChar(c);
               }
               else
               {
-                if (range) sb.Append('-');
-                
+                if (range)
+                {
+                  sb.Append('-');
+                }
+
                 // finish up the class.
                 inClass = false;
                 result.Add(new OneChar(sb.ToString(), negate));
@@ -1089,7 +1263,7 @@ namespace EditorConfig.Core
               break;
 
             case '-':
-              if (i == classStart + 1 || negate && i == classStart + 2 || !inClass || range)
+              if (i == classStart + 1 || (negate && i == classStart + 2) || !inClass || range)
               {
                 AppendChar(c);
               }
@@ -1097,7 +1271,7 @@ namespace EditorConfig.Core
               {
                 range = true;
               }
-              
+
               break;
 
             default:
@@ -1114,7 +1288,7 @@ namespace EditorConfig.Core
             // Do not continue, because next check could be relevant
           }
         }
-        
+
         if (i == pattern.Length - 1)
         {
           if (escaping)
@@ -1128,12 +1302,12 @@ namespace EditorConfig.Core
             FinishLiteral();
           }
         }
-        
+
         void HandleOpenClass()
         {
           // handle the case where we left a class open.
           // "[abc" is valid, equivalent to "\[abc"
-            
+
           // split where the last [ was, and escape it
           // this is a huge pita.  We now have to re-walk
           // the contents of the would-be class to re-translate

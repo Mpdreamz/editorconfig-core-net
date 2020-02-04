@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EditorConfig.Core;
 
 namespace EditorConfig.App
 {
-
-	class Program
+	public static class Program
 	{
-		private static string _fullVersionInfo = "EditorConfig .NET Version " + EditorConfigParser.VersionString;
-		private static string _usage = @"
+		private static readonly string _fullVersionInfo = "EditorConfig .NET Version " + EditorConfigParser.VersionString;
+
+		private static readonly string _usage = @"
 Usage: editorconfig [OPTIONS] FILEPATH1 [FILEPATH2 FILEPATH3 ...]
 
 " + _fullVersionInfo + @"
@@ -26,7 +24,8 @@ Options:
 	-f <path>      Specify conf filename other than "".editorconfig""
 	-b <version>   Specify version (used by devs to test compatibility)
 ";
-		static void Main(string[] args)
+
+		private static void Main(string[] args)
 		{
 			try
 			{
@@ -45,7 +44,7 @@ Options:
 				var configParser = new EditorConfigParser(arguments.ConfigFileName, arguments.DevelopVersion);
 
 				var results = configParser.Parse(arguments.FileNames).ToList();
-				if (!results.Any())
+				if (results.Count == 0)
 				{
 					PrintError("Did not find any config for files:{0}", string.Join(",", args));
 					Environment.Exit(1);
@@ -65,7 +64,7 @@ Options:
 			}
 		}
 
-		static void PrintParserResults(IList<FileConfiguration> configurations)
+		private static void PrintParserResults(IList<FileConfiguration> configurations)
 		{
 			Debug.WriteLine(":: OUTPUT ::::::::::::::::::");
 			foreach (var config in configurations)
@@ -83,7 +82,7 @@ Options:
 			}
 		}
 
-		static void PrintError(string errorMessageFormat, params object[] args)
+		private static void PrintError(string errorMessageFormat, params object[] args)
 		{
 			var d = Console.ForegroundColor;
 			Console.ForegroundColor = ConsoleColor.Red;
@@ -92,10 +91,12 @@ Options:
 			Console.ForegroundColor = d;
 		}
 
-		static void PrintUsage(string errorMessageFormat = null, params object[] args)
+		private static void PrintUsage(string errorMessageFormat = null, params object[] args)
 		{
 			if (!string.IsNullOrWhiteSpace(errorMessageFormat))
+			{
 				PrintError(errorMessageFormat, args);
+			}
 
 			Console.WriteLine(_usage.Trim());
 			Environment.Exit(1);

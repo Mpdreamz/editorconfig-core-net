@@ -7,6 +7,7 @@
 	{
 		Latin1,
 		UTF8,
+
 		/// <summary>
 		/// Usage of UFT8BOM is discouraged
 		/// </summary>

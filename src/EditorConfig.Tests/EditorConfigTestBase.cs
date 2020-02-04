@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using EditorConfig.Core;
 using FluentAssertions;
 
@@ -21,7 +17,7 @@ namespace EditorConfig.Tests
 
 		protected FileConfiguration GetConfig(MethodBase method, string fileName, string configurationFile = ".editorconfig")
 		{
-			var file = this.GetFileFromMethod(method, fileName);
+			var file = GetFileFromMethod(method, fileName);
 			var parser = new EditorConfigParser(configurationFile);
 			var fileConfigs = parser.Parse(file);
 			fileConfigs.Should().NotBeNull();
@@ -37,8 +33,7 @@ namespace EditorConfig.Tests
 			var file = Path.Combine(folder, fileName.Replace(@"\", folderSep));
 
 			var cwd = Environment.CurrentDirectory;
-			file = Path.Combine(cwd.Replace(OutputPath("Release"), "").Replace(OutputPath("Debug"), ""), file);
-			return file;
+			return Path.Combine(cwd.Replace(OutputPath("Release"), "").Replace(OutputPath("Debug"), ""), file);
 
 			string OutputPath(string configuration) => $"bin{folderSep}netcoreapp2.0{folderSep}{configuration}";
 		}

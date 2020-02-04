@@ -22,22 +22,24 @@ namespace EditorConfig.Tests
 		[Test]
 		public void MatcherTest()
 		{
-			var glob = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
-			var file = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
+			const string glob = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
+			const string file = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
 			var m = GlobMatcher.Create(glob, _globOptions);
 			var match = m.IsMatch(file);
 			match.Should().BeTrue();
 		}
 
-		static void TestCase(string pattern, IList<string> expected, GlobMatcherOptions options = null, IEnumerable<string> input = null)
+		private static void TestCase(string pattern, IList<string> expected, GlobMatcherOptions options = null, IEnumerable<string> input = null)
 		{
-			input = input ?? files;
+			input ??= files;
 
 			var filtered = input;
 			var mm = GlobMatcher.Create(pattern, options);
 			filtered = filtered.Where(mm.IsMatch);
-			if (options != null && options.NoNull)
+			if (options?.NoNull == true)
+			{
 				filtered = filtered.DefaultIfEmpty(pattern);
+			}
 
 			filtered = filtered.OrderBy(s => s);
 
@@ -48,15 +50,15 @@ namespace EditorConfig.Tests
 			);
 		}
 
-		static void AddFiles(params string[] entries) { files.AddRange(entries); }
+		private static void AddFiles(params string[] entries) { files.AddRange(entries); }
 
-		static void ReplaceFiles(params string[] entries)
+		private static void ReplaceFiles(params string[] entries)
 		{
 			files.Clear();
 			files.AddRange(entries);
 		}
 
-		static readonly List<string> files = new List<string>();
+		private static readonly List<string> files = new List<string>();
 
 		[SetUp]
 		public void DefaultFiles()
@@ -177,12 +179,10 @@ namespace EditorConfig.Tests
 			TestCase("[[]", new[] { "[" }, null, new[] { "[" });
 			TestCase("[", new[] { "[" }, null, new[] { "[" });
 
-
 			// a right bracket shall lose its special meaning and
 			// represent itself in a bracket expression if it occurs
 			// first in the list.  -- POSIX.2 2.8.3.2
 			TestCase("[*", new[] { "[abc" }, null, new[] { "[abc" });
-
 
 			TestCase("[]]", new[] { "]" }, null, new[] { "]" });
 			TestCase("[]-]", new[] { "]" }, null, new[] { "]" });
@@ -234,7 +234,6 @@ namespace EditorConfig.Tests
 		{
 			AddFiles("a-b", "aXb", ".x", ".y", "a*b/", "a*b/ooo", "man/", "man/man1/", "man/man1/bash.1");
 
-
 			TestCase(
 				"XYZ", new[] { "xYz" }, new GlobMatcherOptions { IgnoreCase = true, /*null = true*/ }
 				, new[] { "xYz", "ABC", "IjK" });
@@ -271,7 +270,7 @@ namespace EditorConfig.Tests
 			AddFiles("a-b", "aXb", ".x", ".y", "a*b/", "a*b/ooo", "man/", "man/man1/", "man/man1/bash.1");
 
 			//"Dots should not match unless requested"
-			TestCase("**", new[] { "a/b" }, new GlobMatcherOptions { }, new[] { "a/b", "a/.d", ".a/.d" });
+			TestCase("**", new[] { "a/b" }, new GlobMatcherOptions(), new[] { "a/b", "a/.d", ".a/.d" });
 
 			// .. and . can only match patterns starting with .,
 			// even when options.Dot is set.
@@ -280,7 +279,6 @@ namespace EditorConfig.Tests
 			TestCase("a/.*/b", new[] { "a/./b", "a/../b", "a/.d/b" }, new GlobMatcherOptions { Dot = true });
 			TestCase("a/*/b", new[] { "a/c/b" }, new GlobMatcherOptions { Dot = false });
 			TestCase("a/.*/b", new[] { "a/./b", "a/../b", "a/.d/b" }, new GlobMatcherOptions { Dot = false });
-
 
 			// this also tests that changing the options needs
 			// to change the cache key, even if the pattern is
@@ -315,8 +313,8 @@ namespace EditorConfig.Tests
 			//TestCase("*(a|{b),c)}", new[] { "a", "ab", "ac" }, new EditorConfigMinimatcherOptions { }, new[] { "a", "ab", "ac", "ad" });
 
 			// test partial parsing in the presence of comment/negation chars
-			TestCase("[!a*", new[] { "[!ab" }, new GlobMatcherOptions { }, new[] { "[!ab", "[ab" });
-			TestCase("[#a*", new[] { "[#ab" }, new GlobMatcherOptions { }, new[] { "[#ab", "[ab" });
+			TestCase("[!a*", new[] { "[!ab" }, new GlobMatcherOptions(), new[] { "[!ab", "[ab" });
+			TestCase("[#a*", new[] { "[#ab" }, new GlobMatcherOptions(), new[] { "[#ab", "[ab" });
 
 			// like: {a,b|c\\,d\\\|e} except it's unclosed, so it has to be escaped.
 			/*TestCase(
@@ -344,11 +342,10 @@ namespace EditorConfig.Tests
 			//TestCase("{a,*(b|{c,d})}", new[] { "a", "b", "bc", "cb", "c", "d" });
 			//TestCase("*(a|{b|c,c})", new[] { "a", "b", "c", "ab", "ac", "bc", "cb" });
 
-
 			// test various flag settings.
 			TestCase(
 				"*(a|{b|c,c})", new[] { "x(a|b|c)", "x(a|c)", "(a|b|c)", "(a|c)" }
-				, new GlobMatcherOptions { });
+				, new GlobMatcherOptions());
 			TestCase(
 				"a?b", new[] { "x/y/acb", "acb/" }, new GlobMatcherOptions { MatchBase = true }
 				, new[] { "x/y/acb", "acb/", "acb/d/e", "x/y/acb/d" });

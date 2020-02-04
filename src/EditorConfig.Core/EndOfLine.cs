@@ -5,10 +5,10 @@ namespace EditorConfig.Core
 	/// </summary>
 	public enum EndOfLine
 	{
-// ReSharper disable InconsistentNaming
+		// ReSharper disable InconsistentNaming
 		LF,
 		CR,
 		CRLF
-// ReSharper restore InconsistentNaming
+		// ReSharper restore InconsistentNaming
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace EditorConfig.Core
 {
@@ -15,7 +14,7 @@ namespace EditorConfig.Core
 		/// <summary>
 		/// The current (and latest parser supported) version as string
 		/// </summary>
-		public static readonly string VersionString = "0.12.1";
+		public static readonly string VersionString = GetAssemblyVersion();
 
 		/// <summary>
 		/// The current editorconfig version
@@ -23,17 +22,17 @@ namespace EditorConfig.Core
 		public static readonly Version Version = new Version(VersionString);
 
 		private readonly GlobMatcherOptions _globOptions = new GlobMatcherOptions { MatchBase = true, Dot = true, AllowWindowsPaths = true };
-		
+
 		/// <summary>
 		/// The configured name of the files holding editorconfig values, defaults to ".editorconfig"
 		/// </summary>
-		public string ConfigFileName { get; private set; }
-		
+		public string ConfigFileName { get; }
+
 		/// <summary>
 		/// The editor config parser version in use, defaults to latest <see cref="EditorConfigParser.Version"/>
 		/// </summary>
-		public Version ParseVersion { get; private set; }
-		
+		public Version ParseVersion { get; }
+
 		/// <summary>
 		/// The EditorConfigParser locates all relevant editorconfig files and makes sure they are merged correctly.
 		/// </summary>
@@ -51,26 +50,26 @@ namespace EditorConfig.Core
 		public IEnumerable<FileConfiguration> Parse(params string[] fileNames)
 		{
 			return fileNames
-				.Select(this.Parse)
+				.Select(Parse)
 				.ToList();
 		}
 
 		public FileConfiguration Parse(string fileName)
 		{
-			var file = fileName.Trim().Trim(new[] {'\r', '\n'});
-			Debug.WriteLine(":: {0} :: {1}", this.ConfigFileName, file);
+			var file = fileName.Trim().Trim(new[] { '\r', '\n' });
+			Debug.WriteLine(":: {0} :: {1}", ConfigFileName, file);
 
 			var fullPath = Path.GetFullPath(file).Replace(@"\", "/");
-			var configFiles = this.AllParentConfigFiles(fullPath);
+			var configFiles = AllParentConfigFiles(fullPath);
 
 			//All the .editorconfig files going from root =>.fileName
-			var editorConfigFiles = this.ParseConfigFilesTillRoot(configFiles).Reverse();
+			var editorConfigFiles = ParseConfigFilesTillRoot(configFiles).Reverse();
 
 			var sections =
 				from configFile in editorConfigFiles
 				from section in configFile.Sections
-				let glob = this.FixGlob(section.Name, configFile.Directory)
-				where this.IsMatch(glob, fullPath, configFile.Directory)
+				let glob = FixGlob(section.Name, configFile.Directory)
+				where IsMatch(glob, fullPath)
 				select section;
 
 			var allProperties =
@@ -80,12 +79,23 @@ namespace EditorConfig.Core
 
 			var properties = new Dictionary<string, string>();
 			foreach (var kv in allProperties)
+			{
 				properties[kv.Key] = kv.Value;
+			}
 
 			return new FileConfiguration(ParseVersion, file, properties);
 		}
 
-		private bool IsMatch(string glob, string fileName, string directory)
+		private static string GetAssemblyVersion()
+		{
+			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+			string version = fvi.FileVersion;
+
+			return version;
+		}
+
+		private bool IsMatch(string glob, string fileName)
 		{
 			var matcher = GlobMatcher.Create(glob, _globOptions);
 			var isMatch = matcher.IsMatch(fileName);
@@ -100,28 +110,34 @@ namespace EditorConfig.Core
 				case -1: glob = "**/" + glob; break;
 				case 0: glob = glob.Substring(1); break;
 			}
-			
+
 			//glob = Regex.Replace(glob, @"\*\*", "{*,**/**/**}");
 
 			directory = directory.Replace(@"\", "/");
-			if (!directory.EndsWith("/")) directory += "/";
+			if (!directory.EndsWith("/"))
+			{
+				directory += "/";
+			}
 
 			return directory + glob;
 		}
 
 		private IEnumerable<EditorConfigFile> ParseConfigFilesTillRoot(IEnumerable<string> configFiles)
 		{
-			foreach (var configFile in configFiles.Select(f=> new EditorConfigFile(f)))
+			foreach (var configFile in configFiles.Select(f => new EditorConfigFile(f)))
 			{
 				yield return configFile;
-				if (configFile.IsRoot) yield break;
+				if (configFile.IsRoot)
+				{
+					yield break;
+				}
 			}
 		}
 
 		private IEnumerable<string> AllParentConfigFiles(string fullPath)
 		{
-			return from parent in this.AllParentDirectories(fullPath)
-				   let configFile = Path.Combine(parent, this.ConfigFileName)
+			return from parent in AllParentDirectories(fullPath)
+				   let configFile = Path.Combine(parent, ConfigFileName)
 				   where File.Exists(configFile)
 				   select configFile;
 		}
@@ -132,7 +148,11 @@ namespace EditorConfig.Core
 			var dir = Path.GetDirectoryName(fullPath);
 			do
 			{
-				if (dir == null) yield break;
+				if (dir == null)
+				{
+					yield break;
+				}
+
 				yield return dir;
 				var dirInfo = new DirectoryInfo(dir);
 				dir = dirInfo.Parent.FullName;
