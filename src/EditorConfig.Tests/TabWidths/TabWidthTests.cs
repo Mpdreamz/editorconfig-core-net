@@ -35,7 +35,9 @@ namespace EditorConfig.Tests.TabWidths
 
 			// Set indent_size to tab_width if indent_size is "tab"
 			file.IndentSize.Should().NotBeNull();
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 			file.IndentSize.NumberOfColumns.Should().Be(file.TabWidth.Value);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 		}
 
 		[Test]

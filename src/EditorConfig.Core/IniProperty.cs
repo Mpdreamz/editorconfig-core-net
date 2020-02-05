@@ -2,7 +2,7 @@
 {
 	public class IniProperty : IniLine
 	{
-		public IniProperty(uint lineNumber, string key, string value) : base(lineNumber, IniLineType.Property)
+		public IniProperty(int lineNumber, string key, string value) : base(lineNumber, IniLineType.Property)
         {
 			Key = key;
 			Value = value;

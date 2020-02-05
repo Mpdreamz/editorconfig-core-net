@@ -2,7 +2,7 @@
 {
 	public abstract class IniLine
 	{
-		protected IniLine(uint lineNumber, IniLineType lineType)
+		protected IniLine(int lineNumber, IniLineType lineType)
         {
 			LineType = lineType;
 			LineNumber = lineNumber;
@@ -10,6 +10,6 @@
 
 		public IniLineType LineType { get; }
 
-		public uint LineNumber { get; }
+		public int LineNumber { get; }
 	}
 }

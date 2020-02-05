@@ -8,10 +8,10 @@ namespace EditorConfig.Core
 	/// </summary>
 	public class IniSection : IniLine
 	{
-		private readonly Dictionary<uint, IniLine> _lineDictionary = new Dictionary<uint, IniLine>();
+		private readonly Dictionary<int, IniLine> _lineDictionary = new Dictionary<int, IniLine>();
 		private readonly Dictionary<string, IniProperty> _propertyDictionary = new Dictionary<string, IniProperty>();
 
-		public IniSection(uint lineNumber, string name) : base(lineNumber, IniLineType.SectionHeader)
+		public IniSection(int lineNumber, string name) : base(lineNumber, IniLineType.SectionHeader)
 		{
 			Name = name;
 			AddLine(this);
@@ -19,9 +19,9 @@ namespace EditorConfig.Core
 
 		public string Name { get; }
 
-		public IDictionary<uint, IniProperty> Properties => GetLinesOfType<IniProperty>(IniLineType.Property);
+		public IDictionary<int, IniProperty> Properties => GetLinesOfType<IniProperty>(IniLineType.Property);
 
-		public IDictionary<uint, IniComment> Comments => GetLinesOfType<IniComment>(IniLineType.Comment);
+		public IDictionary<int, IniComment> Comments => GetLinesOfType<IniComment>(IniLineType.Comment);
 
 		public void AddLine(IniLine iniLine)
 		{
@@ -44,7 +44,7 @@ namespace EditorConfig.Core
 			return _propertyDictionary.TryGetValue(key, out prop);
 		}
 
-		private IDictionary<uint, TLine> GetLinesOfType<TLine>(IniLineType lineType)
+		private IDictionary<int, TLine> GetLinesOfType<TLine>(IniLineType lineType)
 			where TLine : IniLine => _lineDictionary.Where(kvp => kvp.Value.LineType == lineType).ToDictionary(kvp => kvp.Key, kvp => (TLine)kvp.Value);
 	}
 }

@@ -15,7 +15,7 @@ namespace EditorConfig.Core
 		/// a whole number defining the number of columns used for each indentation level and the width of soft tabs (when supported). 
 		/// When set to tab, the value of tab_width (if specified) will be used.
 		/// </summary>
-		public IndentSize IndentSize { get; private set; } = new IndentSize();
+		public IndentSize? IndentSize { get; private set; }
 
 		/// <summary>
 		/// a whole number defining the number of columns used to represent a tab character. 

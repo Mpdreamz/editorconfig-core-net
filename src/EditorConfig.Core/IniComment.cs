@@ -2,7 +2,7 @@
 {
 	public class IniComment : IniLine
 	{
-		public IniComment(uint lineNumber, string text) : base(lineNumber, IniLineType.Comment)
+		public IniComment(int lineNumber, string text) : base(lineNumber, IniLineType.Comment)
         {
 			Text = text;
 		}

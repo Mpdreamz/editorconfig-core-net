@@ -30,8 +30,8 @@ namespace EditorConfig.Core
 			}
 
 			Directory = Path.GetDirectoryName(file);
-
-			Global = Parse(file);
+			Global = new IniSection(-1, "Global");
+			Parse(file);
 
 			if (Global != null && Global.TryGetProperty("root", out var rootProp))
 			{
@@ -39,7 +39,7 @@ namespace EditorConfig.Core
 			}
 		}
 
-		public IniSection? Global { get; }
+		public IniSection Global { get; }
 
 		public IReadOnlyList<IniSection> Sections => _sections;
 
@@ -47,14 +47,13 @@ namespace EditorConfig.Core
 
 		public bool IsRoot => _isRoot;
 
-		private IniSection? Parse(string file)
+		private void Parse(string file)
 		{
 			var lines = File.ReadLines(file);
 
-			uint currentLineNumber = 0;
+			int currentLineNumber = 0;
 
-			IniSection? globalSection = null;
-			IniSection? activeSection = null;
+			IniSection activeSection = Global;
 			foreach (var line in lines)
 			{
 				try
@@ -80,11 +79,6 @@ namespace EditorConfig.Core
 
 						var prop = new IniProperty(currentLineNumber, key, value);
 
-						if (activeSection == null)
-						{
-							throw new InvalidOperationException($"Trying to add a property before the active section has been set. Line: {currentLineNumber}");
-						}
-
 						activeSection.AddLine(prop);
 						continue;
 					}
@@ -97,11 +91,6 @@ namespace EditorConfig.Core
 					var sectionName = matches[0].Groups[1].Value;
 					activeSection = new IniSection(currentLineNumber, sectionName);
 
-					if (sectionName.Equals("*", StringComparison.Ordinal))
-					{
-						globalSection = activeSection;
-					}
-
 					_sections.Add(activeSection);
 				}
 				finally
@@ -109,8 +98,6 @@ namespace EditorConfig.Core
 					currentLineNumber++;
 				}
 			}
-
-			return globalSection;
 		}
 	}
 }

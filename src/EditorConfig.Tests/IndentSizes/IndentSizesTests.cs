@@ -12,7 +12,9 @@ namespace EditorConfig.Tests.IndentSizes
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".positive.editorconfig");
 			file.IndentSize.Should().NotBeNull();
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 			file.IndentSize.NumberOfColumns.Should().Be(2);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 			file.IndentSize.UseTabWidth.Should().BeFalse();
 
 			//tab_width is unspecified and indent_size is a positive integer, editorconfig dictates 
@@ -33,7 +35,9 @@ namespace EditorConfig.Tests.IndentSizes
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".tab.editorconfig");
 			file.IndentSize.Should().NotBeNull();
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 			file.IndentSize.NumberOfColumns.Should().NotHaveValue();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 			file.IndentSize.UseTabWidth.Should().BeTrue();
 		}
 
