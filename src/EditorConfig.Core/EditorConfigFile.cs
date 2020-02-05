@@ -34,7 +34,7 @@ namespace EditorConfig.Core
 
 		public bool IsRoot => _isRoot;
 
-		public void Parse(string file)
+		private void Parse(string file)
 		{
 			var lines = File.ReadLines(file);
 
