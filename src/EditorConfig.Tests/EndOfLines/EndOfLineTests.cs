@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.EndOfLines
 {
 	[TestFixture]
-	internal class EndOfLineTests : EditorConfigTestBase
+	public class EndOfLineTests : EditorConfigTestBase
 	{
 		[Test]
 		public void Lf()

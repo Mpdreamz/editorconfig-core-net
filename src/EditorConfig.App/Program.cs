@@ -25,6 +25,7 @@ Options:
 	-b <version>   Specify version (used by devs to test compatibility)
 ";
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
 		private static void Main(string[] args)
 		{
 			try
@@ -91,11 +92,13 @@ Options:
 			Console.ForegroundColor = d;
 		}
 
-		private static void PrintUsage(string errorMessageFormat = null, params object[] args)
+		private static void PrintUsage(string? errorMessageFormat = null, params object[] args)
 		{
 			if (!string.IsNullOrWhiteSpace(errorMessageFormat))
 			{
+#pragma warning disable CS8604 // Possible null reference argument.
 				PrintError(errorMessageFormat, args);
+#pragma warning restore CS8604 // Possible null reference argument.
 			}
 
 			Console.WriteLine(_usage.Trim());

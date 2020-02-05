@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Globalization;
 
 namespace EditorConfig.App
 {
+	[Serializable]
 	public class ApplicationArgumentException : Exception
 	{
 		public ApplicationArgumentException(string message, params object[] args)
-			: base(string.Format(message, args))
+			: base(string.Format(CultureInfo.InvariantCulture, message, args))
 		{
 		}
 
@@ -18,6 +20,11 @@ namespace EditorConfig.App
 		}
 
 		public ApplicationArgumentException(string message, Exception innerException) : base(message, innerException)
+		{
+		}
+
+		protected ApplicationArgumentException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) :
+			base(serializationInfo, streamingContext)
 		{
 		}
 	}

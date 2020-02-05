@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.Limits
 {
 	[TestFixture]
-	internal class LimitTests : EditorConfigTestBase
+	public class LimitTests : EditorConfigTestBase
 	{
 		[Test]
 		public void KeyLengths()

@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.IndentStyles
 {
 	[TestFixture]
-	internal class IndentStyleTests : EditorConfigTestBase
+	public class IndentStyleTests : EditorConfigTestBase
 	{
 		[Test]
 		public void Space()

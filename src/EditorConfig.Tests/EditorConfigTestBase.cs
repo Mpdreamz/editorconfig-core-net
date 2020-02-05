@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using EditorConfig.Core;
@@ -8,15 +9,30 @@ namespace EditorConfig.Tests
 {
 	public class EditorConfigTestBase
 	{
-		protected void HasBogusKey(FileConfiguration file, string key)
+		protected static void HasBogusKey(FileConfiguration file, string key)
 		{
+			if (file is null)
+			{
+				throw new ArgumentNullException(nameof(file));
+			}
+
+			if (string.IsNullOrEmpty(key))
+			{
+				throw new ArgumentException("message", nameof(key));
+			}
+
 			file.Properties.Should().NotBeEmpty().And.HaveCount(1).And.ContainKey(key);
 			var bogusCharset = file.Properties[key];
 			bogusCharset.Should().Be("bogus");
 		}
 
-		protected FileConfiguration GetConfig(MethodBase method, string fileName, string configurationFile = ".editorconfig")
+		protected static FileConfiguration GetConfig(MethodBase? method, string fileName, string configurationFile = ".editorconfig")
 		{
+			if (method == null)
+			{
+				throw new ArgumentException("The method must not be null", nameof(method));
+			}
+
 			var file = GetFileFromMethod(method, fileName);
 			var parser = new EditorConfigParser(configurationFile);
 			var fileConfigs = parser.Parse(file);
@@ -24,16 +40,38 @@ namespace EditorConfig.Tests
 			return fileConfigs;
 		}
 
-		protected string GetFileFromMethod(MethodBase method, string fileName)
+		protected static string GetFileFromMethod(MethodBase? method, string fileName)
 		{
+			if (method is null)
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			if (string.IsNullOrEmpty(fileName))
+			{
+				throw new ArgumentException("message", nameof(fileName));
+			}
+
 			var type = method.DeclaringType;
+
+			if (type == null)
+			{
+				throw new ArgumentException("The method's declaring type must be non-null", nameof(method));
+			}
+
 			var @namespace = type.Namespace;
-			var folderSep = Path.DirectorySeparatorChar.ToString();
-			var folder = @namespace.Replace("EditorConfig.Tests.", "").Replace(".", folderSep);
-			var file = Path.Combine(folder, fileName.Replace(@"\", folderSep));
+			var folderSep = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
+
+			if (@namespace == null)
+			{
+				throw new ArgumentException("The method's declaring type's namespace must be non-null", nameof(method));
+			}
+
+			var folder = @namespace.Replace("EditorConfig.Tests.", "", StringComparison.Ordinal).Replace(".", folderSep, StringComparison.Ordinal);
+			var file = Path.Combine(folder, fileName.Replace(@"\", folderSep, StringComparison.Ordinal));
 
 			var cwd = Environment.CurrentDirectory;
-			return Path.Combine(cwd.Replace(OutputPath("Release"), "").Replace(OutputPath("Debug"), ""), file);
+			return Path.Combine(cwd.Replace(OutputPath("Release"), "", StringComparison.Ordinal).Replace(OutputPath("Debug"), "", StringComparison.Ordinal), file);
 
 			string OutputPath(string configuration) => $"bin{folderSep}netcoreapp2.0{folderSep}{configuration}";
 		}

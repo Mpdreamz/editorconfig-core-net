@@ -5,14 +5,16 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.MaxLineLengths
 {
 	[TestFixture]
-	internal class MaxLineLengthsTests : EditorConfigTestBase
+	public class MaxLineLengthsTests : EditorConfigTestBase
 	{
 		[Test]
 		public void PositiveNumber()
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".positive.editorconfig");
 			file.MaxLineLength.Should().HaveValue();
+#pragma warning disable CS8629 // Nullable value type may be null.
 			file.MaxLineLength.Value.Should().Be(120);
+#pragma warning restore CS8629 // Nullable value type may be null.
 		}
 
 		[Test]

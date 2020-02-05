@@ -5,14 +5,16 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.TabWidths
 {
 	[TestFixture]
-	internal class TabWidthTests : EditorConfigTestBase
+	public class TabWidthTests : EditorConfigTestBase
 	{
 		[Test]
 		public void PositiveNumber()
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".positive.editorconfig");
 			file.TabWidth.Should().HaveValue();
+#pragma warning disable CS8629 // Nullable value type may be null.
 			file.TabWidth.Value.Should().Be(4);
+#pragma warning restore CS8629 // Nullable value type may be null.
 		}
 
 		[Test]
@@ -27,7 +29,9 @@ namespace EditorConfig.Tests.TabWidths
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".tab.editorconfig");
 			file.TabWidth.Should().HaveValue();
+#pragma warning disable CS8629 // Nullable value type may be null.
 			file.TabWidth.Value.Should().Be(4);
+#pragma warning restore CS8629 // Nullable value type may be null.
 
 			// Set indent_size to tab_width if indent_size is "tab"
 			file.IndentSize.Should().NotBeNull();

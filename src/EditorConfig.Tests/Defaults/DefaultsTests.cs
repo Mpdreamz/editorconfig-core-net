@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using EditorConfig.Core;
 using FluentAssertions;
@@ -7,7 +8,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.Defaults
 {
 	[TestFixture]
-	internal class DefaultsTests : EditorConfigTestBase
+	public class DefaultsTests : EditorConfigTestBase
 	{
 		[Test]
 		public void CanFindFile()

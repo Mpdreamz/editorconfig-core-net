@@ -38,7 +38,7 @@ namespace EditorConfig.Core
 		/// </summary>
 		/// <param name="configFileName">The name of the file(s) holding the editorconfiguration values</param>
 		/// <param name="developmentVersion">Only used in testing, development to pass an older version to the parsing routine</param>
-		public EditorConfigParser(string configFileName = ".editorconfig", Version developmentVersion = null)
+		public EditorConfigParser(string configFileName = ".editorconfig", Version? developmentVersion = null)
 		{
 			ConfigFileName = configFileName ?? ".editorconfig";
 			ParseVersion = developmentVersion ?? Version;
@@ -56,6 +56,11 @@ namespace EditorConfig.Core
 
 		public FileConfiguration Parse(string fileName)
 		{
+			if (string.IsNullOrWhiteSpace(fileName))
+			{
+				throw new ArgumentException("message", nameof(fileName));
+			}
+
 			var file = fileName.Trim().Trim(new[] { '\r', '\n' });
 			Debug.WriteLine(":: {0} :: {1}", ConfigFileName, file);
 
@@ -74,8 +79,8 @@ namespace EditorConfig.Core
 
 			var allProperties =
 				from section in sections
-				from kv in section
-				select FileConfiguration.Sanitize(kv.Key, kv.Value);
+				from kv in section.Properties
+				select FileConfiguration.Sanitize(kv.Value.Key, kv.Value.Value);
 
 			var properties = new Dictionary<string, string>();
 			foreach (var kv in allProperties)
@@ -103,7 +108,7 @@ namespace EditorConfig.Core
 			return isMatch;
 		}
 
-		private string FixGlob(string glob, string directory)
+		private static string FixGlob(string glob, string directory)
 		{
 			switch (glob.IndexOf('/'))
 			{
@@ -114,7 +119,7 @@ namespace EditorConfig.Core
 			//glob = Regex.Replace(glob, @"\*\*", "{*,**/**/**}");
 
 			directory = directory.Replace(@"\", "/");
-			if (!directory.EndsWith("/"))
+			if (!directory.EndsWith("/", StringComparison.Ordinal))
 			{
 				directory += "/";
 			}
@@ -122,7 +127,7 @@ namespace EditorConfig.Core
 			return directory + glob;
 		}
 
-		private IEnumerable<EditorConfigFile> ParseConfigFilesTillRoot(IEnumerable<string> configFiles)
+		private static IEnumerable<EditorConfigFile> ParseConfigFilesTillRoot(IEnumerable<string> configFiles)
 		{
 			foreach (var configFile in configFiles.Select(f => new EditorConfigFile(f)))
 			{
@@ -142,7 +147,7 @@ namespace EditorConfig.Core
 				   select configFile;
 		}
 
-		private IEnumerable<string> AllParentDirectories(string fullPath)
+		private static IEnumerable<string> AllParentDirectories(string fullPath)
 		{
 			var root = new DirectoryInfo(fullPath).Root.FullName;
 			var dir = Path.GetDirectoryName(fullPath);

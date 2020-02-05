@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.StopAtRoot
 {
 	[TestFixture]
-	internal class StopsAtRootTests : EditorConfigTestBase
+	public class StopsAtRootTests : EditorConfigTestBase
 	{
 		[Test]
 		public void SomeProp_HasValueFromClosestConfig()

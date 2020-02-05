@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.IndentSizes
 {
 	[TestFixture]
-	internal class IndentSizesTests : EditorConfigTestBase
+	public class IndentSizesTests : EditorConfigTestBase
 	{
 		[Test]
 		public void PositiveNumber()

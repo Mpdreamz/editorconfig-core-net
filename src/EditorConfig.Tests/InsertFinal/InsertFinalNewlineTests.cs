@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.InsertFinal
 {
 	[TestFixture]
-	internal class InsertFinalNewlineTests : EditorConfigTestBase
+	public class InsertFinalNewlineTests : EditorConfigTestBase
 	{
 		[Test]
 		public void True()

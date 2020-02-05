@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -59,12 +60,12 @@ namespace EditorConfig.Core
   public sealed class GlobMatcher
   {
     private readonly GlobMatcherOptions myOptions;
-    private readonly List<PatternCase> mySet;
+    private readonly List<PatternCase>? mySet;
     private readonly bool myNegate;
     private readonly bool myComment;
     private readonly bool myEmpty;
 
-    private GlobMatcher(GlobMatcherOptions options, List<PatternCase> parsedPatternSet = null, bool negate = false, bool comment = false, bool empty = false)
+    private GlobMatcher(GlobMatcherOptions options, List<PatternCase>? parsedPatternSet = null, bool negate = false, bool comment = false, bool empty = false)
     {
       myOptions = options;
       mySet = parsedPatternSet;
@@ -79,6 +80,10 @@ namespace EditorConfig.Core
     ///<summary>Checks whether a given string matches this pattern.</summary>
     public bool IsMatch(string input)
     {
+      if (input is null)
+      {
+        throw new ArgumentNullException(nameof(input));
+      }
       // short-circuit in the case of busted things.
       // comments, etc.
       if (myComment)
@@ -95,6 +100,11 @@ namespace EditorConfig.Core
       // in order for it to be valid.  If negating, then just one
       // match means that we have failed.
       // Either way, return on the first hit.
+
+      if (mySet == null)
+      {
+        throw new InvalidOperationException();
+      }
 
       foreach (var pattern in mySet)
       {
@@ -150,17 +160,14 @@ namespace EditorConfig.Core
 
       public bool MatchOne()
       {
-        if (myOptions.MatchBase)
+        if (myOptions.MatchBase && !myPatternCase.HasPathSeparators)
         {
-          if (!myPatternCase.HasPathSeparators)
-          {
-            SkipLastPathSeparators();
+          SkipLastPathSeparators();
 
-            int lastSeparator = myStr.LastIndexOfAny(PathSeparatorChars, myEndOffset - 1, myEndOffset - myStartOffset);
-            if (lastSeparator != -1)
-            {
-              myStartOffset = lastSeparator + 1;
-            }
+          int lastSeparator = myStr.LastIndexOfAny(PathSeparatorChars, myEndOffset - 1, myEndOffset - myStartOffset);
+          if (lastSeparator != -1)
+          {
+            myStartOffset = lastSeparator + 1;
           }
         }
 
@@ -189,9 +196,7 @@ namespace EditorConfig.Core
       {
         while (myStartItem <= myEndItem)
         {
-          var item = myPatternCase[myEndItem];
-
-          switch (item)
+          switch (myPatternCase[myEndItem])
           {
             case Asterisk _:
               return true;
@@ -584,12 +589,9 @@ namespace EditorConfig.Core
           }
 
           var dotPos = myStr.IndexOf('.', oldStartPos, length);
-          if (dotPos != -1)
+          if (dotPos != -1 && !CheckDot(dotPos))
           {
-            if (!CheckDot(dotPos))
-            {
-              return false;
-            }
+            return false;
           }
         }
 
@@ -657,7 +659,7 @@ namespace EditorConfig.Core
       public void Build()
       {
         HasPathSeparators = false;
-        Asterisk lastAsterisk = null;
+        Asterisk? lastAsterisk = null;
         int fixedItemsLength = 0;
         for (int i = 0; i < Count; i++)
         {
@@ -730,13 +732,13 @@ namespace EditorConfig.Core
       static OneChar() { }
       public static readonly OneChar EmptyInstance = new OneChar(null, false);
 
-      public OneChar(string possibleChars, bool negate)
+      public OneChar(string? possibleChars, bool negate)
       {
         PossibleChars = possibleChars;
         Negate = negate;
       }
 
-      private string PossibleChars { get; }
+      private string? PossibleChars { get; }
       private bool Negate { get; }
 
       public bool CheckChar(GlobMatcherOptions options, char c, StringComparison comparison)
@@ -748,7 +750,7 @@ namespace EditorConfig.Core
 
         if (PossibleChars != null)
         {
-          return (PossibleChars.IndexOf(c.ToString(), comparison) != -1) != Negate;
+          return (PossibleChars.IndexOf(c.ToString(CultureInfo.InvariantCulture), comparison) != -1) != Negate;
         }
 
         return true;
@@ -757,8 +759,10 @@ namespace EditorConfig.Core
 
     private abstract class Asterisk : IPatternElement
     {
-      public Asterisk NextAsterisk { get; set; }
+      public Asterisk? NextAsterisk { get; set; }
+
       public int LiteralAfterAsterisk { get; set; } = -1;
+
       public int FixedItemsLengthAfterAsterisk { get; set; }
     }
 
@@ -778,14 +782,14 @@ namespace EditorConfig.Core
     }
 
     ///<summary>Creates a new GlobMatcher instance, parsing the pattern into a regex.</summary>
-    public static GlobMatcher Create(string pattern, GlobMatcherOptions options = null)
+    public static GlobMatcher Create(string pattern, GlobMatcherOptions? options = null)
     {
       if (pattern == null)
       {
         throw new ArgumentNullException(nameof(pattern));
       }
 
-      options = options ?? new GlobMatcherOptions();
+      options ??= new GlobMatcherOptions();
       pattern = pattern.Trim();
       if (options.AllowWindowsPathsInPatterns)
       {
@@ -798,7 +802,7 @@ namespace EditorConfig.Core
         return new GlobMatcher(options, comment: true);
       }
 
-      if (String.IsNullOrEmpty(pattern))
+      if (string.IsNullOrEmpty(pattern))
       {
         return new GlobMatcher(options, empty: true);
       }
@@ -907,7 +911,7 @@ namespace EditorConfig.Core
       if (pattern[0] != '{')
       {
         // console.error(pattern)
-        string prefix = null;
+        string? prefix = null;
         for (i = 0; i < pattern.Length; i++)
         {
           var c = pattern[i];
@@ -952,8 +956,8 @@ namespace EditorConfig.Core
       {
         // console.error("numset", numset[1], numset[2])
         var suf = BraceExpand(pattern.Substring(numset.Length), options).ToList();
-        int start = int.Parse(numset.Groups[1].Value),
-          end = int.Parse(numset.Groups[2].Value),
+        int start = int.Parse(numset.Groups[1].Value, CultureInfo.InvariantCulture),
+          end = int.Parse(numset.Groups[2].Value, CultureInfo.InvariantCulture),
           inc = start > end ? -1 : 1;
 
         var retVal = new List<string>(Math.Abs(end + inc - start) * suf.Count);
@@ -962,7 +966,7 @@ namespace EditorConfig.Core
           // append all the suffixes
           foreach (var t in suf)
           {
-            retVal.Add(w.ToString() + t);
+            retVal.Add(w.ToString(CultureInfo.InvariantCulture) + t);
           }
         }
 
@@ -1086,7 +1090,7 @@ namespace EditorConfig.Core
     }
 
     // parse a component of the expanded set.
-    private static PatternCase Parse(GlobMatcherOptions options, string pattern)
+    private static PatternCase Parse(GlobMatcherOptions options, string? pattern)
     {
       if (pattern?.Length == 0)
       {
@@ -1127,6 +1131,11 @@ namespace EditorConfig.Core
         {
           sb.Append(c1);
         }
+      }
+
+      if (pattern == null)
+      {
+        throw new InvalidOperationException();
       }
 
       for (var i = 0; i < pattern.Length; i++)

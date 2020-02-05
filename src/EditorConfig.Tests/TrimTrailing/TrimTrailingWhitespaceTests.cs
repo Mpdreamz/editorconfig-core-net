@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace EditorConfig.Tests.TrimTrailing
 {
 	[TestFixture]
-	internal class TrimTrailingWhitespaceTests : EditorConfigTestBase
+	public class TrimTrailingWhitespaceTests : EditorConfigTestBase
 	{
 		[Test]
 		public void True()
