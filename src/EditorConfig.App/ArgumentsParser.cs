@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-
-namespace EditorConfig.App
+﻿namespace EditorConfig.App
 {
+	using System;
+	using System.Linq;
+
 	internal class ArgumentsParser
 	{
 		public string[] FileNames { get; } =

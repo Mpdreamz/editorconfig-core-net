@@ -1,9 +1,11 @@
-﻿using System.Reflection;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.MaxLineLengths
+﻿namespace EditorConfig.Tests.MaxLineLengths
 {
+	using System.Reflection;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class MaxLineLengthsTests : EditorConfigTestBase
 	{
@@ -13,7 +15,7 @@ namespace EditorConfig.Tests.MaxLineLengths
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".positive.editorconfig");
 			file.MaxLineLength.Should().HaveValue();
 #pragma warning disable CS8629 // Nullable value type may be null.
-			file.MaxLineLength.Value.Should().Be(120);
+			file.MaxLineLength?.Should().Be(120);
 #pragma warning restore CS8629 // Nullable value type may be null.
 		}
 

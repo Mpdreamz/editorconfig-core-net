@@ -1,10 +1,13 @@
-﻿using System.Reflection;
-using EditorConfig.Core;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.Charsets
+﻿namespace EditorConfig.Tests.Charsets
 {
+	using System.Reflection;
+
+	using EditorConfig.Core;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class CharsetTests : EditorConfigTestBase
 	{
@@ -12,28 +15,28 @@ namespace EditorConfig.Tests.Charsets
 		public void Utf8()
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".utf8.editorconfig");
-			file.Charset.Should().Be(Charset.UTF8);
+			file.Charset.Should().Be(Charset.Utf8);
 		}
 
 		[Test]
 		public void Utf8Bom()
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".utf8-bom.editorconfig");
-			file.Charset.Should().Be(Charset.UTF8BOM);
+			file.Charset.Should().Be(Charset.Utf8Bom);
 		}
 
 		[Test]
-		public void Utf16le()
+		public void Utf16Le()
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".utf16le.editorconfig");
-			file.Charset.Should().Be(Charset.UTF16LE);
+			file.Charset.Should().Be(Charset.Utf16Le);
 		}
 
 		[Test]
-		public void Utf16be()
+		public void Utf16Be()
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".utf16be.editorconfig");
-			file.Charset.Should().Be(Charset.UTF16BE);
+			file.Charset.Should().Be(Charset.Utf16Be);
 		}
 
 		[Test]

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-
-namespace EditorConfig.Core
+﻿namespace EditorConfig.Core
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Text.RegularExpressions;
+
 	/// <summary>
 	/// Represents the raw config file as INI
 	/// </summary>
@@ -14,7 +14,6 @@ namespace EditorConfig.Core
 		private readonly Regex _comment = new Regex(@"^\s*[#;](.*)");
 		private readonly Regex _property = new Regex(@"^\s*([\w\.\-_]+)\s*[=:]\s*(.*?)\s*([#;].*)?$");
 
-		private readonly bool _isRoot;
 		private readonly List<IniSection> _sections = new List<IniSection>();
 
 		public EditorConfigFile(string file)
@@ -33,9 +32,14 @@ namespace EditorConfig.Core
 			Global = new IniSection(0, "Global");
 			Parse(file);
 
-			if (Global != null && Global.TryGetProperty("root", out var rootProp))
+			if (Global == null || !Global.TryGetProperty("root", out var rootProp))
 			{
-				_ = bool.TryParse(rootProp.Value, out _isRoot);
+				return;
+			}
+
+			if (bool.TryParse(rootProp.Value, out var isRoot))
+			{
+				IsRoot = isRoot;
 			}
 		}
 
@@ -45,7 +49,7 @@ namespace EditorConfig.Core
 
 		public string Directory { get; }
 
-		public bool IsRoot => _isRoot;
+		public bool IsRoot { get; }
 
 		private void Parse(string file)
 		{
@@ -66,7 +70,7 @@ namespace EditorConfig.Core
 						IniComment iniComment = new IniComment(currentLineNumber, text);
 
 						// We will discard any comments from before the first section
-						activeSection?.AddLine(iniComment);
+						activeSection.AddLine(iniComment);
 
 						continue;
 					}

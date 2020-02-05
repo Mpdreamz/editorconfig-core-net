@@ -1,11 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-
 namespace EditorConfig.Core
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
+
 	/// <summary>
 	/// The EditorConfigParser locates all relevant editorconfig files and makes sure they are merged correctly.
 	/// </summary>
@@ -47,7 +48,7 @@ namespace EditorConfig.Core
 		/// <summary>
 		/// Gets the FileConfiguration for each of the passed fileName by resolving their relevant editorconfig files.
 		/// </summary>
-		public IEnumerable<FileConfiguration> Parse(params string[] fileNames)
+		public IEnumerable<FileConfiguration> ParseMany(params string[] fileNames)
 		{
 			return fileNames
 				.Select(Parse)
@@ -61,7 +62,7 @@ namespace EditorConfig.Core
 				throw new ArgumentException("message", nameof(fileName));
 			}
 
-			var file = fileName.Trim().Trim(new[] { '\r', '\n' });
+			var file = fileName.Trim().Trim('\r', '\n');
 			Debug.WriteLine(":: {0} :: {1}", ConfigFileName, file);
 
 			var fullPath = Path.GetFullPath(file).Replace(@"\", "/");
@@ -93,7 +94,7 @@ namespace EditorConfig.Core
 
 		private static string GetAssemblyVersion()
 		{
-			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			Assembly assembly = Assembly.GetExecutingAssembly();
 			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 			string version = fvi.FileVersion;
 
@@ -104,7 +105,7 @@ namespace EditorConfig.Core
 		{
 			var matcher = GlobMatcher.Create(glob, _globOptions);
 			var isMatch = matcher.IsMatch(fileName);
-			Debug.WriteLine("{0} :: {1} \t\t:: {2}", isMatch ? "?" : "?", glob, fileName);
+			Debug.WriteLine("{0} :: {1} \t\t:: {2}", "?", glob, fileName);
 			return isMatch;
 		}
 
@@ -149,8 +150,8 @@ namespace EditorConfig.Core
 
 		private static IEnumerable<string> AllParentDirectories(string fullPath)
 		{
-			var root = new DirectoryInfo(fullPath).Root.FullName;
-			var dir = Path.GetDirectoryName(fullPath);
+			string root = new DirectoryInfo(fullPath).Root.FullName;
+			string dir = Path.GetDirectoryName(fullPath);
 			do
 			{
 				if (dir == null)
@@ -160,6 +161,11 @@ namespace EditorConfig.Core
 
 				yield return dir;
 				var dirInfo = new DirectoryInfo(dir);
+				if (dirInfo.Parent == null)
+				{
+					throw new InvalidOperationException("Directory parent is null");
+				}
+
 				dir = dirInfo.Parent.FullName;
 			} while (dir != root);
 		}

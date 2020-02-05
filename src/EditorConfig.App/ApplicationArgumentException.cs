@@ -1,8 +1,9 @@
-﻿using System;
-using System.Globalization;
-
-namespace EditorConfig.App
+﻿namespace EditorConfig.App
 {
+	using System;
+	using System.Globalization;
+	using System.Runtime.Serialization;
+
 	[Serializable]
 	public class ApplicationArgumentException : Exception
 	{
@@ -11,7 +12,7 @@ namespace EditorConfig.App
 		{
 		}
 
-		public ApplicationArgumentException() : base()
+		public ApplicationArgumentException()
 		{
 		}
 
@@ -23,7 +24,7 @@ namespace EditorConfig.App
 		{
 		}
 
-		protected ApplicationArgumentException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) :
+		protected ApplicationArgumentException(SerializationInfo serializationInfo, StreamingContext streamingContext) :
 			base(serializationInfo, streamingContext)
 		{
 		}

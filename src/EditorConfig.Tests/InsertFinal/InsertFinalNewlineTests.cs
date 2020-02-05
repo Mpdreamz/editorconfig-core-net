@@ -1,9 +1,11 @@
-﻿using System.Reflection;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.InsertFinal
+﻿namespace EditorConfig.Tests.InsertFinal
 {
+	using System.Reflection;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class InsertFinalNewlineTests : EditorConfigTestBase
 	{

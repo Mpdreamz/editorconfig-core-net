@@ -1,9 +1,11 @@
-﻿using System.Reflection;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.TrimTrailing
+﻿namespace EditorConfig.Tests.TrimTrailing
 {
+	using System.Reflection;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class TrimTrailingWhitespaceTests : EditorConfigTestBase
 	{

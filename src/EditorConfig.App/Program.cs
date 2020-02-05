@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using EditorConfig.Core;
-
-namespace EditorConfig.App
+﻿namespace EditorConfig.App
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.Diagnostics.CodeAnalysis;
+	using System.Linq;
+
+	using EditorConfig.Core;
+
 	public static class Program
 	{
-		private static readonly string _fullVersionInfo = "EditorConfig .NET Version " + EditorConfigParser.VersionString;
+		private static readonly string FullVersionInfo = "EditorConfig .NET Version " + EditorConfigParser.VersionString;
 
-		private static readonly string _usage = @"
+		private static readonly string Usage = @"
 Usage: editorconfig [OPTIONS] FILEPATH1 [FILEPATH2 FILEPATH3 ...]
 
-" + _fullVersionInfo + @"
+" + FullVersionInfo + @"
 
 FILEPATH can be a hyphen (-) if you want path(s) to be read from stdin.
 
@@ -25,26 +27,31 @@ Options:
 	-b <version>   Specify version (used by devs to test compatibility)
 ";
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-		private static void Main(string[] args)
+		[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
+		public static void Main(string[] args)
 		{
+			if (args is null)
+			{
+				throw new ArgumentNullException(nameof(args));
+			}
+
 			try
 			{
 				var arguments = new ArgumentsParser(args);
 				if (arguments.PrintVersion)
 				{
-					Console.WriteLine(_fullVersionInfo);
+					Console.WriteLine(FullVersionInfo);
 					return;
 				}
 				if (arguments.PrintHelp)
 				{
-					Console.WriteLine(_usage.Trim());
+					Console.WriteLine(Usage.Trim());
 					return;
 				}
 
 				var configParser = new EditorConfigParser(arguments.ConfigFileName, arguments.DevelopVersion);
 
-				var results = configParser.Parse(arguments.FileNames).ToList();
+				var results = configParser.ParseMany(arguments.FileNames).ToList();
 				if (results.Count == 0)
 				{
 					PrintError("Did not find any config for files:{0}", string.Join(",", args));
@@ -101,7 +108,7 @@ Options:
 #pragma warning restore CS8604 // Possible null reference argument.
 			}
 
-			Console.WriteLine(_usage.Trim());
+			Console.WriteLine(Usage.Trim());
 			Environment.Exit(1);
 		}
 	}

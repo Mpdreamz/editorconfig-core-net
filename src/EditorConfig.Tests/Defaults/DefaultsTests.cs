@@ -1,12 +1,15 @@
-﻿using System.IO;
-using System.Reflection;
-using EditorConfig.Core;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.Defaults
+﻿namespace EditorConfig.Tests.Defaults
 {
-	[TestFixture]
+    using System.IO;
+    using System.Reflection;
+
+    using EditorConfig.Core;
+
+    using FluentAssertions;
+
+    using NUnit.Framework;
+
+    [TestFixture]
 	public class DefaultsTests : EditorConfigTestBase
 	{
 		[Test]

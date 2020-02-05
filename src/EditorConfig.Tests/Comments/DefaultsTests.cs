@@ -1,13 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using EditorConfig.Core;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.Comments
+﻿namespace EditorConfig.Tests.Comments
 {
-	[TestFixture]
+    using System.IO;
+    using System.Reflection;
+
+    using EditorConfig.Core;
+
+    using FluentAssertions;
+
+    using NUnit.Framework;
+
+    [TestFixture]
 	public class CommentsTests : EditorConfigTestBase
 	{
 		private const string GlobalCommentText = "GLOBAL COMMENT";

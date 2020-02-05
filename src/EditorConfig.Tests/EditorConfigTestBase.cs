@@ -1,12 +1,14 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
-using EditorConfig.Core;
-using FluentAssertions;
-
-namespace EditorConfig.Tests
+﻿namespace EditorConfig.Tests
 {
+	using System;
+	using System.Globalization;
+	using System.IO;
+	using System.Reflection;
+
+	using EditorConfig.Core;
+
+	using FluentAssertions;
+
 	public class EditorConfigTestBase
 	{
 		protected static void HasBogusKey(FileConfiguration file, string key)

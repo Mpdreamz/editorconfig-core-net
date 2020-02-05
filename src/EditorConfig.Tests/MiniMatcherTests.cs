@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using EditorConfig.Core;
-using FluentAssertions;
-using NUnit.Framework;
-
-/*
+﻿/*
  * (c) 2018 JetBrains s.r.o., SLaks, EditorConfig Team
  * Under MIT License
  * From https://github.com/editorconfig/editorconfig-core-net
@@ -14,6 +7,16 @@ using NUnit.Framework;
 
 namespace EditorConfig.Tests
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+
+	using EditorConfig.Core;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class MiniMatcherTests
 	{
@@ -22,16 +25,16 @@ namespace EditorConfig.Tests
 		[Test]
 		public void MatcherTest()
 		{
-			const string glob = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
-			const string file = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
-			var m = GlobMatcher.Create(glob, _globOptions);
-			var match = m.IsMatch(file);
+			const string Glob = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
+			const string File = "C:/Projects/editorconfig-core-net/tests/filetree/top/of/path";
+			var m = GlobMatcher.Create(Glob, _globOptions);
+			var match = m.IsMatch(File);
 			match.Should().BeTrue();
 		}
 
 		private static void TestCase(string pattern, IList<string> expected, GlobMatcherOptions? options = null, IEnumerable<string>? input = null)
 		{
-			input ??= files;
+			input ??= Files;
 
 			var filtered = input;
 			var mm = GlobMatcher.Create(pattern, options);
@@ -50,15 +53,15 @@ namespace EditorConfig.Tests
 			);
 		}
 
-		private static void AddFiles(params string[] entries) { files.AddRange(entries); }
+		private static void AddFiles(params string[] entries) { Files.AddRange(entries); }
 
 		private static void ReplaceFiles(params string[] entries)
 		{
-			files.Clear();
-			files.AddRange(entries);
+			Files.Clear();
+			Files.AddRange(entries);
 		}
 
-		private static readonly List<string> files = new List<string>();
+		private static readonly List<string> Files = new List<string>();
 
 		[SetUp]
 		public void DefaultFiles()
@@ -90,7 +93,7 @@ namespace EditorConfig.Tests
 
 			TestCase("b*/", new[] { "bdir/" });
 			TestCase("c*", new[] { "c", "ca", "cb" });
-			TestCase("**", files);
+			TestCase("**", Files);
 
 			TestCase("\\.\\./*/", new[] { "\\.\\./*/" }, new GlobMatcherOptions { NoNull = true });
 			TestCase("s/\\..*//", new[] { "s/\\..*//" }, new GlobMatcherOptions { NoNull = true });
@@ -126,25 +129,16 @@ namespace EditorConfig.Tests
 			TestCase("a\\*b/*", new[] { "a*b/ooo" });
 			TestCase("a\\*?/*", new[] { "a*b/ooo" });
 			TestCase(
-				"*\\\\!*", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "echo !7" });
+				"*\\\\!*", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "echo !7" });
 			TestCase("*\\!*", new[] { "echo !7" }, null, new[] { "echo !7" });
 			TestCase("*.\\*", new[] { "r.*" }, null, new[] { "r.*" });
 			TestCase("a[b]c", new[] { "abc" });
 			TestCase("a[\\b]c", new[] { "abc" });
 			TestCase("a?c", new[] { "abc" });
 			TestCase(
-				"a\\*c", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "abc" });
+				"a\\*c", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "abc" });
 			TestCase(
-				"", new[] { "" }, new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "" });
+				"", new[] { "" }, new GlobMatcherOptions(), new[] { "" });
 		}
 
 		[Test]
@@ -188,45 +182,21 @@ namespace EditorConfig.Tests
 			TestCase("[]-]", new[] { "]" }, null, new[] { "]" });
 			TestCase(@"[a-\z]", new[] { "p" }, null, new[] { "p" });
 			TestCase(
-				"??**********?****?", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "abc" });
+				"??**********?****?", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "abc" });
 			TestCase(
-				"??**********?****c", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "abc" });
+				"??**********?****c", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "abc" });
 			TestCase(
-				"?************c****?****", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "abc" });
+				"?************c****?****", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "abc" });
 			TestCase(
-				"*c*?**", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "abc" });
+				"*c*?**", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "abc" });
 			TestCase(
-				"a*****c*?**", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "abc" });
+				"a*****c*?**", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "abc" });
 			TestCase(
-				"a********???*******", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "abc" });
+				"a********???*******", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "abc" });
 			TestCase(
-				"[]", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "a" });
+				"[]", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "a" });
 			TestCase(
-				"[abc", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "[" });
+				"[abc", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "[" });
 		}
 
 		[Test]
@@ -235,13 +205,13 @@ namespace EditorConfig.Tests
 			AddFiles("a-b", "aXb", ".x", ".y", "a*b/", "a*b/ooo", "man/", "man/man1/", "man/man1/bash.1");
 
 			TestCase(
-				"XYZ", new[] { "xYz" }, new GlobMatcherOptions { IgnoreCase = true, /*null = true*/ }
+				"XYZ", new[] { "xYz" }, new GlobMatcherOptions { IgnoreCase = true /*null = true*/ }
 				, new[] { "xYz", "ABC", "IjK" });
 			TestCase(
-				"ab*", new[] { "ABC" }, new GlobMatcherOptions { IgnoreCase = true, /*null = true*/ }
+				"ab*", new[] { "ABC" }, new GlobMatcherOptions { IgnoreCase = true /*null = true*/ }
 				, new[] { "xYz", "ABC", "IjK" });
 			TestCase(
-				"[ia]?[ck]", new[] { "ABC", "IjK" }, new GlobMatcherOptions { IgnoreCase = true, /*null = true*/ }
+				"[ia]?[ck]", new[] { "ABC", "IjK" }, new GlobMatcherOptions { IgnoreCase = true /*null = true*/ }
 				, new[] { "xYz", "ABC", "IjK" });
 		}
 
@@ -252,16 +222,9 @@ namespace EditorConfig.Tests
 
 			// [ pattern, new [] { matches }, MM opts, files, TAP opts]
 			TestCase(
-				"{/*,*}", Array.Empty<string>(), new GlobMatcherOptions
-				{
-					/*null = true*/
-				}, new[] { "/asdf/asdf/asdf" });
+				"{/*,*}", Array.Empty<string>(), new GlobMatcherOptions(), new[] { "/asdf/asdf/asdf" });
 			TestCase(
-				"{/?,*}", new[] { "/a", "bb" }, new GlobMatcherOptions
-				{
-					/*null = true*/
-				}
-				, new[] { "/a", "/b/b", "/a/b/c", "bb" });
+				"{/?,*}", new[] { "/a", "bb" }, new GlobMatcherOptions(), new[] { "/a", "/b/b", "/a/b/c", "bb" });
 		}
 
 		[Test]

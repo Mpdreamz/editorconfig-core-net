@@ -1,9 +1,11 @@
-﻿using System.Reflection;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.Limits
+﻿namespace EditorConfig.Tests.Limits
 {
+	using System.Reflection;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class LimitTests : EditorConfigTestBase
 	{

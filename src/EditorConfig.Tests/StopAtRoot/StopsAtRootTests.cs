@@ -1,9 +1,11 @@
-﻿using System.Reflection;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.StopAtRoot
+﻿namespace EditorConfig.Tests.StopAtRoot
 {
+	using System.Reflection;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class StopsAtRootTests : EditorConfigTestBase
 	{

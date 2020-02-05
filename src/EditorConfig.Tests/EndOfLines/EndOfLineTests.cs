@@ -1,10 +1,13 @@
-﻿using System.Reflection;
-using EditorConfig.Core;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.EndOfLines
+﻿namespace EditorConfig.Tests.EndOfLines
 {
+	using System.Reflection;
+
+	using EditorConfig.Core;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class EndOfLineTests : EditorConfigTestBase
 	{

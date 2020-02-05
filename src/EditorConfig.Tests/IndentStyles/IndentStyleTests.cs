@@ -1,10 +1,13 @@
-﻿using System.Reflection;
-using EditorConfig.Core;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.IndentStyles
+﻿namespace EditorConfig.Tests.IndentStyles
 {
+	using System.Reflection;
+
+	using EditorConfig.Core;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class IndentStyleTests : EditorConfigTestBase
 	{

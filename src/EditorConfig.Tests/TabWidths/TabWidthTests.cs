@@ -1,9 +1,11 @@
-﻿using System.Reflection;
-using FluentAssertions;
-using NUnit.Framework;
-
-namespace EditorConfig.Tests.TabWidths
+﻿namespace EditorConfig.Tests.TabWidths
 {
+	using System.Reflection;
+
+	using FluentAssertions;
+
+	using NUnit.Framework;
+
 	[TestFixture]
 	public class TabWidthTests : EditorConfigTestBase
 	{
@@ -13,7 +15,7 @@ namespace EditorConfig.Tests.TabWidths
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".positive.editorconfig");
 			file.TabWidth.Should().HaveValue();
 #pragma warning disable CS8629 // Nullable value type may be null.
-			file.TabWidth.Value.Should().Be(4);
+			file.TabWidth?.Should().Be(4);
 #pragma warning restore CS8629 // Nullable value type may be null.
 		}
 
@@ -25,18 +27,18 @@ namespace EditorConfig.Tests.TabWidths
 		}
 
 		[Test]
-		public void TabIndenSizeAndSpecifiedTabWidth()
+		public void TabIndentSizeAndSpecifiedTabWidth()
 		{
 			var file = GetConfig(MethodBase.GetCurrentMethod(), "f.x", ".tab.editorconfig");
 			file.TabWidth.Should().HaveValue();
 #pragma warning disable CS8629 // Nullable value type may be null.
-			file.TabWidth.Value.Should().Be(4);
+			file.TabWidth?.Should().Be(4);
 #pragma warning restore CS8629 // Nullable value type may be null.
 
 			// Set indent_size to tab_width if indent_size is "tab"
 			file.IndentSize.Should().NotBeNull();
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-			file.IndentSize.NumberOfColumns.Should().Be(file.TabWidth.Value);
+			file.IndentSize.NumberOfColumns.Should().Be(file.TabWidth);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 		}
 

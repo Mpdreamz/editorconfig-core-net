@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-
-namespace EditorConfig.Core
+﻿namespace EditorConfig.Core
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics.CodeAnalysis;
+	using System.Linq;
+
 	/// <summary>
 	/// Represents an ini section within the editorconfig file
 	/// </summary>
@@ -28,7 +29,7 @@ namespace EditorConfig.Core
 		{
 			if (iniLine is null)
 			{
-				throw new System.ArgumentNullException(nameof(iniLine));
+				throw new ArgumentNullException(nameof(iniLine));
 			}
 
 			_lineDictionary.Add(iniLine.LineNumber, iniLine);
@@ -49,10 +50,10 @@ namespace EditorConfig.Core
 		{
 			if (string.IsNullOrWhiteSpace(commentText))
 			{
-				throw new System.ArgumentException("message", nameof(commentText));
+				throw new ArgumentException("message", nameof(commentText));
 			}
 
-			comment = Comments.Values.FirstOrDefault(c => c.Text.Equals(commentText, System.StringComparison.OrdinalIgnoreCase));
+			comment = Comments.Values.FirstOrDefault(c => c.Text.Equals(commentText, StringComparison.OrdinalIgnoreCase));
 			return comment != null;
 		}
 

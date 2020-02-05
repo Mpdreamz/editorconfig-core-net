@@ -6,14 +6,14 @@
 	public enum Charset
 	{
 		Latin1,
-		UTF8,
+		Utf8,
 
 		/// <summary>
 		/// Usage of UFT8BOM is discouraged
 		/// </summary>
-		UTF8BOM,
-		UTF16BE,
-		UTF16LE,
+		Utf8Bom,
+		Utf16Be,
+		Utf16Le
 
 	}
 }

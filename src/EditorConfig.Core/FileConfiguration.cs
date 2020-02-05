@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace EditorConfig.Core
+﻿namespace EditorConfig.Core
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+
 	public class FileConfiguration
 	{
 		/// <summary>
@@ -58,12 +58,12 @@ namespace EditorConfig.Core
 			"trim_trailing_whitespace",
 			"insert_final_newline",
 			"max_line_length",
-			"root",
+			"root"
 		};
 
 		private readonly Dictionary<string, string> _properties;
 
-		public IDictionary<string, string> Properties { get { return _properties; } }
+		public IDictionary<string, string> Properties => _properties;
 
 		/// <summary>
 		/// The filename we asked the configuration for
@@ -153,10 +153,10 @@ namespace EditorConfig.Core
 			switch (indentStyle)
 			{
 				case "space":
-					IndentStyle = EditorConfig.Core.IndentStyle.Space;
+					IndentStyle = Core.IndentStyle.Space;
 					return;
 				case "tab":
-					IndentStyle = EditorConfig.Core.IndentStyle.Tab;
+					IndentStyle = Core.IndentStyle.Tab;
 					return;
 			}
 		}
@@ -229,13 +229,13 @@ namespace EditorConfig.Core
 			switch (endOfLine)
 			{
 				case "lf":
-					EndOfLine = EditorConfig.Core.EndOfLine.LF;
+					EndOfLine = Core.EndOfLine.LF;
 					return;
 				case "cr":
-					EndOfLine = EditorConfig.Core.EndOfLine.CR;
+					EndOfLine = Core.EndOfLine.CR;
 					return;
 				case "crlf":
-					EndOfLine = EditorConfig.Core.EndOfLine.CRLF;
+					EndOfLine = Core.EndOfLine.CRLF;
 					return;
 			}
 		}
@@ -250,19 +250,19 @@ namespace EditorConfig.Core
 			switch (charset)
 			{
 				case "latin1":
-					Charset = EditorConfig.Core.Charset.Latin1;
+					Charset = Core.Charset.Latin1;
 					return;
 				case "utf-16be":
-					Charset = EditorConfig.Core.Charset.UTF16BE;
+					Charset = Core.Charset.Utf16Be;
 					return;
 				case "utf-16le":
-					Charset = EditorConfig.Core.Charset.UTF16LE;
+					Charset = Core.Charset.Utf16Le;
 					return;
 				case "utf-8":
-					Charset = EditorConfig.Core.Charset.UTF8;
+					Charset = Core.Charset.Utf8;
 					return;
 				case "utf-8-bom":
-					Charset = EditorConfig.Core.Charset.UTF8BOM;
+					Charset = Core.Charset.Utf8Bom;
 					return;
 			}
 		}
