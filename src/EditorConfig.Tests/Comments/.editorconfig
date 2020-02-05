@@ -1,0 +1,9 @@
+root=true
+
+# GLOBAL COMMENT
+something=something
+
+[*]
+beforecomment=true
+# SECTION COMMENT
+aftercomment=hello

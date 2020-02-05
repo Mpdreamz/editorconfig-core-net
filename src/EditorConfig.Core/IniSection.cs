@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace EditorConfig.Core
@@ -39,12 +40,24 @@ namespace EditorConfig.Core
 			}
 		}
 
-		public bool TryGetProperty(string key, out IniProperty prop)
+		public bool TryGetProperty(string key, [NotNullWhen(returnValue: true)] out IniProperty? prop)
 		{
 			return _propertyDictionary.TryGetValue(key, out prop);
 		}
 
+		public bool TryFindComment(string commentText, [NotNullWhen(returnValue: true)] out IniComment? comment)
+		{
+			if (string.IsNullOrWhiteSpace(commentText))
+			{
+				throw new System.ArgumentException("message", nameof(commentText));
+			}
+
+			comment = Comments.Values.FirstOrDefault(c => c.Text.Equals(commentText, System.StringComparison.OrdinalIgnoreCase));
+			return comment != null;
+		}
+
 		private IDictionary<int, TLine> GetLinesOfType<TLine>(IniLineType lineType)
-			where TLine : IniLine => _lineDictionary.Where(kvp => kvp.Value.LineType == lineType).ToDictionary(kvp => kvp.Key, kvp => (TLine)kvp.Value);
+			where TLine : IniLine =>
+			_lineDictionary.Where(kvp => kvp.Value.LineType == lineType).ToDictionary(kvp => kvp.Key, kvp => (TLine)kvp.Value);
 	}
 }

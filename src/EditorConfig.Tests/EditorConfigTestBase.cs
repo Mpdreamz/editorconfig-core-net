@@ -67,13 +67,18 @@ namespace EditorConfig.Tests
 				throw new ArgumentException("The method's declaring type's namespace must be non-null", nameof(method));
 			}
 
-			var folder = @namespace.Replace("EditorConfig.Tests.", "", StringComparison.Ordinal).Replace(".", folderSep, StringComparison.Ordinal);
+			var folder = @namespace
+				.Replace("EditorConfig.Tests.", "", StringComparison.Ordinal)
+				.Replace(".", folderSep, StringComparison.Ordinal);
+
 			var file = Path.Combine(folder, fileName.Replace(@"\", folderSep, StringComparison.Ordinal));
 
 			var cwd = Environment.CurrentDirectory;
-			return Path.Combine(cwd.Replace(OutputPath("Release"), "", StringComparison.Ordinal).Replace(OutputPath("Debug"), "", StringComparison.Ordinal), file);
 
-			string OutputPath(string configuration) => $"bin{folderSep}netcoreapp2.0{folderSep}{configuration}";
+			return Path.Combine(cwd.Replace(OutputPath("Release"), "", StringComparison.Ordinal)
+				.Replace(OutputPath("Debug"), "", StringComparison.Ordinal), file);
+
+			string OutputPath(string configuration) => $"bin{folderSep}netcoreapp3.1{folderSep}{configuration}";
 		}
 	}
 }

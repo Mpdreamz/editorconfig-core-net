@@ -30,7 +30,7 @@ namespace EditorConfig.Core
 			}
 
 			Directory = Path.GetDirectoryName(file);
-			Global = new IniSection(-1, "Global");
+			Global = new IniSection(0, "Global");
 			Parse(file);
 
 			if (Global != null && Global.TryGetProperty("root", out var rootProp))
@@ -51,7 +51,7 @@ namespace EditorConfig.Core
 		{
 			var lines = File.ReadLines(file);
 
-			int currentLineNumber = 0;
+			int currentLineNumber = 1;
 
 			IniSection activeSection = Global;
 			foreach (var line in lines)
