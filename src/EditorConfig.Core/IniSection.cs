@@ -47,48 +47,4 @@ namespace EditorConfig.Core
 		private IDictionary<uint, TLine> GetLinesOfType<TLine>(IniLineType lineType)
 			where TLine : IniLine => _lineDictionary.Where(kvp => kvp.Value.LineType == lineType).ToDictionary(kvp => kvp.Key, kvp => (TLine)kvp.Value);
 	}
-
-	public class IniProperty : IniLine
-	{
-		public IniProperty(uint lineNumber, string key, string value) : base(lineNumber, IniLineType.Property)
-        {
-			Key = key;
-			Value = value;
-		}
-
-		public string Key { get; }
-
-		public string Value { get; }
-	}
-
-	public class IniComment : IniLine
-	{
-		public IniComment(uint lineNumber, string text) : base(lineNumber, IniLineType.Comment)
-        {
-			Text = text;
-		}
-
-		public string Text { get; }
-	}
-
-	public abstract class IniLine
-	{
-		protected IniLine(uint lineNumber, IniLineType lineType)
-        {
-			LineType = lineType;
-			LineNumber = lineNumber;
-		}
-
-		public IniLineType LineType { get; }
-
-		public uint LineNumber { get; }
-	}
-
-	public enum IniLineType
-	{
-		None,
-		SectionHeader,
-		Property,
-		Comment
-	}
 }
