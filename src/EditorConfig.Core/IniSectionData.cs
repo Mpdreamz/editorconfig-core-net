@@ -84,42 +84,18 @@
 			where TLine : IniLineData =>
 			_lines.OfType<TLine>();
 
-		public class EditContext : IDisposable
+		public class EditContext : List<IniLineData>
 		{
 			public EditContext(IniSectionData section)
 			{
 				Section = section ?? throw new ArgumentNullException(nameof(section));
 
-				Lines.AddRange(section._lines);
+				AddRange(section._lines);
 			}
 
 			public IniSectionData Section { get; }
 
-			public List<IniLineData> Lines { get; } = new List<IniLineData>();
-
-			public void Add(IniLineData line)
-			{
-				if (line is null)
-				{
-					throw new ArgumentNullException(nameof(line));
-				}
-
-				Lines.Add(line);
-			}
-
-			/// <inheritdoc />
-			public void Dispose()
-			{
-				Dispose(true);
-				GC.SuppressFinalize(this);
-			}
-
-			protected virtual void Dispose(bool disposing)
-			{
-				if (disposing)
-				{
-				}
-			}
+			public IReadOnlyList<IniLineData> Lines => this;
 		}
 	}
 }

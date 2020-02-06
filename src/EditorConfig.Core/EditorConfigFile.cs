@@ -216,31 +216,11 @@
 
 			public IReadOnlyList<IniSectionData.EditContext> Sections { get; }
 
-			public void Add(int startLine, IniLineData line) => AddRange(startLine, new[] { line });
-
-			public void AddRange(int startLine, IEnumerable<IniLineData> newLines)
-			{
-				_lines.InsertRange(startLine - 1, newLines.Select(l => l.ToString()));
-			}
-
 			/// <inheritdoc />
 			public void Dispose()
 			{
 				Dispose(true);
 				GC.SuppressFinalize(this);
-			}
-
-			public void RemoveRange(int startLine, int endLine)
-			{
-				_lines.RemoveRange(startLine - 1, endLine - startLine);
-			}
-
-			public void ReplaceRange(int startLine, int endLine, IEnumerable<IniLineData> newLines)
-			{
-				// Need something to track and calculate offsets when multiple changes are made
-				// For initial implementation, limit things to one change at a time
-				RemoveRange(startLine, endLine);
-				AddRange(startLine, newLines);
 			}
 
 			public void SaveChanges()
