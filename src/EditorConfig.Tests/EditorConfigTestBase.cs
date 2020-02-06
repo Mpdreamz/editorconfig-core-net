@@ -11,23 +11,6 @@
 
 	public class EditorConfigTestBase
 	{
-		protected static void HasBogusKey(FileConfiguration file, string key)
-		{
-			if (file is null)
-			{
-				throw new ArgumentNullException(nameof(file));
-			}
-
-			if (string.IsNullOrEmpty(key))
-			{
-				throw new ArgumentException("message", nameof(key));
-			}
-
-			file.Properties.Should().NotBeEmpty().And.HaveCount(1).And.ContainKey(key);
-			var bogusCharset = file.Properties[key];
-			bogusCharset.Should().Be("bogus");
-		}
-
 		protected static FileConfiguration GetConfig(MethodBase? method, string fileName, string configurationFile = ".editorconfig")
 		{
 			if (method == null)
@@ -77,10 +60,29 @@
 
 			var cwd = Environment.CurrentDirectory;
 
-			return Path.Combine(cwd.Replace(OutputPath("Release"), "", StringComparison.Ordinal)
-				.Replace(OutputPath("Debug"), "", StringComparison.Ordinal), file);
+			return Path.Combine(
+			                    cwd.Replace(OutputPath("Release"), "", StringComparison.Ordinal)
+				                    .Replace(OutputPath("Debug"), "", StringComparison.Ordinal),
+			                    file);
 
 			string OutputPath(string configuration) => $"bin{folderSep}netcoreapp3.1{folderSep}{configuration}";
+		}
+
+		protected static void HasBogusKey(FileConfiguration file, string key)
+		{
+			if (file is null)
+			{
+				throw new ArgumentNullException(nameof(file));
+			}
+
+			if (string.IsNullOrEmpty(key))
+			{
+				throw new ArgumentException("message", nameof(key));
+			}
+
+			file.Properties.Should().NotBeEmpty().And.HaveCount(1).And.ContainKey(key);
+			var bogusCharset = file.Properties[key];
+			bogusCharset.Should().Be("bogus");
 		}
 	}
 }

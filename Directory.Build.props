@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<LangVersion>8.0</LangVersion>
 		<Nullable>enable</Nullable>
-		<NoWarn>$(NoWarn);CA1303;CA1308</NoWarn>
+		<NoWarn>$(NoWarn);CA1034;CA1303;CA1308</NoWarn>
 	</PropertyGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' != 'netcoreapp3.1' ">
 		<PackageReference Include="Compat.System.Diagnostics.CodeAnalysis" Version="0.1.1" />

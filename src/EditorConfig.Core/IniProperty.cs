@@ -1,9 +1,10 @@
 ﻿namespace EditorConfig.Core
 {
-	public class IniProperty : IniLine
+	public class IniProperty : IniLineData
 	{
-		public IniProperty(int lineNumber, string key, string value) : base(lineNumber, IniLineType.Property)
-        {
+		public IniProperty(string key, string value)
+			: base(IniLineType.Property)
+		{
 			Key = key;
 			Value = value;
 		}
@@ -11,5 +12,8 @@
 		public string Key { get; }
 
 		public string Value { get; }
+
+		/// <inheritdoc />
+		public override string ToString() => $"{Key}={Value}";
 	}
 }

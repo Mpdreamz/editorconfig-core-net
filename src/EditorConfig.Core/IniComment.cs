@@ -1,12 +1,18 @@
 ﻿namespace EditorConfig.Core
 {
-	public class IniComment : IniLine
-	{
-		public IniComment(int lineNumber, string text) : base(lineNumber, IniLineType.Comment)
+    public class IniComment : IniLineData
+    {
+        public IniComment(string text) : base(IniLineType.Comment)
         {
-			Text = text;
-		}
+            Text = text;
+        }
 
-		public string Text { get; }
-	}
+        public string Text { get; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"# {Text}";
+        }
+    }
 }

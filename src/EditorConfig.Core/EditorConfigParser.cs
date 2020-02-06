@@ -81,7 +81,7 @@ namespace EditorConfig.Core
 			var allProperties =
 				from section in sections
 				from kv in section.Properties
-				select FileConfiguration.Sanitize(kv.Value.Key, kv.Value.Value);
+				select FileConfiguration.Sanitize(kv.Key, kv.Value);
 
 			var properties = new Dictionary<string, string>();
 			foreach (var kv in allProperties)

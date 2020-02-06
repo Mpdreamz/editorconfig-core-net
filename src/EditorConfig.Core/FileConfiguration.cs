@@ -174,7 +174,7 @@
 					IndentSize = new IndentSize();
 					return;
 				case "tab":
-					IndentSize = new IndentSize(useTabs: true);
+					IndentSize = new IndentSize(true);
 					return;
 				default:
 					int size;
