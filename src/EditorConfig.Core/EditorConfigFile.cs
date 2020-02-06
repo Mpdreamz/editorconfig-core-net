@@ -43,28 +43,20 @@
 
 			Directory = Path.GetDirectoryName(file);
 
+			_lines.AddRange(File.ReadAllLines(FullPath, _encoding));
+
 			Global = IniSectionData.Global();
 
 			Parse();
-
-			if (!Global.TryGetProperty("root", out var rootProp))
-			{
-				return;
-			}
-
-			if (bool.TryParse(rootProp.Value, out var isRoot))
-			{
-				IsRoot = isRoot;
-			}
 		}
 
 		public string Directory { get; }
 
 		public string FullPath { get; }
 
-		public IniSectionData Global { get; }
+		public IniSectionData Global { get; private set; }
 
-		public bool IsRoot { get; }
+		public bool IsRoot { get; private set; }
 
 		public IReadOnlyList<IniSectionData> Sections => _sections.Values.ToList();
 
@@ -73,7 +65,7 @@
 			return new EditContext(this);
 		}
 
-		public bool TryFindComment(string commentText, IniSectionData section, [NotNullWhen(true)] out IniLine<IniComment>? comment)
+		public bool TryGetComment(string commentText, IniSectionData section, [NotNullWhen(true)] out IniLine<IniComment>? comment)
 		{
 			if (string.IsNullOrWhiteSpace(commentText))
 			{
@@ -85,7 +77,7 @@
 				throw new ArgumentNullException(nameof(section));
 			}
 
-			if (!section.TryFindComment(commentText, out var commentData, out var offset))
+			if (!section.TryGetComment(commentText, out var commentData, out var offset))
 			{
 				comment = null;
 				return false;
@@ -99,11 +91,34 @@
 			return true;
 		}
 
+		public bool TryGetProperty(string key, IniSectionData section, [NotNullWhen(true)] out IniLine<IniProperty>? property)
+		{
+			if (string.IsNullOrWhiteSpace(key))
+			{
+				throw new ArgumentException("message", nameof(key));
+			}
+
+			if (section == null)
+			{
+				throw new ArgumentNullException(nameof(section));
+			}
+
+			if (!section.TryGetProperty(key, out var propertyData, out var offset))
+			{
+				property = null;
+				return false;
+			}
+
+			var baseLineNumber = section.IsGlobal ? 0 : _sections.First(kvp => ReferenceEquals(kvp.Value, section)).Key;
+
+			var lineNumber = baseLineNumber + offset + 1;
+
+			property = new IniLine<IniProperty>(lineNumber, propertyData);
+			return true;
+		}
+
 		private void Parse()
 		{
-			_lines.Clear();
-			_lines.AddRange(File.ReadAllLines(FullPath, _encoding));
-
 			int currentLineNumber = 0;
 
 			IniSectionData activeSection = Global;
@@ -143,6 +158,7 @@
 						activeSection = new IniSectionData(sectionName);
 
 						_sections.Add(currentLineNumber, activeSection);
+						continue;
 					}
 
 					activeSection.AddLine(new IniEmptyLine());
@@ -152,6 +168,27 @@
 					currentLineNumber++;
 				}
 			}
+
+			if (!TryGetProperty("root", Global, out var rootProp))
+			{
+				return;
+			}
+
+			if (bool.TryParse(rootProp.Line.Value, out var isRoot))
+			{
+				IsRoot = isRoot;
+			}
+		}
+
+		private void ResetTo(IEnumerable<string> lines)
+		{
+			_lines.Clear();
+			_sections.Clear();
+
+			_lines.AddRange(lines);
+			Global = IniSectionData.Global();
+
+			Parse();
 		}
 
 		public class EditContext : IDisposable
@@ -171,8 +208,11 @@
 				// Make a copy of the data for editing
 				_lines = _editorConfigFile._lines.ToList();
 
+				Global = new IniSectionData.EditContext(_editorConfigFile.Global);
 				Sections = _editorConfigFile.Sections.Select(s => new IniSectionData.EditContext(s)).ToList();
 			}
+
+			public IniSectionData.EditContext Global { get; }
 
 			public IReadOnlyList<IniSectionData.EditContext> Sections { get; }
 
@@ -205,15 +245,31 @@
 
 			public void SaveChanges()
 			{
-				string fullText = string.Join(Environment.NewLine, _editorConfigFile._lines);
+				_lines.Clear();
+
+				foreach (var line in Global.Lines)
+				{
+					_lines.Add(line.ToString());
+				}
+
+				foreach (var section in Sections)
+				{
+					foreach (var line in section.Lines)
+					{
+						_lines.Add(line.ToString());
+					}
+				}
+
+				string fullText = string.Join(Environment.NewLine, _lines);
 
 				var bytes = _editorConfigFile._encoding.GetBytes(fullText);
+
+				var length = Math.Max(bytes.Length, _lock.Length);
 
 				_lock.Write(bytes, 0, bytes.Length);
 
 				// Replace the file class' data if the operation is successful
-				_editorConfigFile._lines.Clear();
-				_editorConfigFile._lines.AddRange(_lines);
+				_editorConfigFile.ResetTo(_lines);
 			}
 
 			protected virtual void Dispose(bool disposing)
@@ -224,8 +280,6 @@
 				}
 
 				_lock.Dispose();
-
-				_editorConfigFile.Parse();
 			}
 		}
 	}

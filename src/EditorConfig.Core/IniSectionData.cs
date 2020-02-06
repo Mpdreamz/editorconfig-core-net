@@ -61,7 +61,7 @@
 		/// <inheritdoc />
 		public override string ToString() => $"[{Name}]";
 
-		public bool TryFindComment(string commentText, [NotNullWhen(true)] out IniComment? comment, out int offset)
+		public bool TryGetComment(string commentText, [NotNullWhen(true)] out IniComment? comment, out int offset)
 		{
 			if (string.IsNullOrWhiteSpace(commentText))
 			{
@@ -73,9 +73,11 @@
 			return comment != null;
 		}
 
-		public bool TryGetProperty(string key, [NotNullWhen(true)] out IniProperty? prop)
+		public bool TryGetProperty(string key, [NotNullWhen(true)] out IniProperty? prop, out int offset)
 		{
-			return _propertyDictionary.TryGetValue(key, out prop);
+			var found = _propertyDictionary.TryGetValue(key, out prop);
+			offset = _lines.IndexOf(prop);
+			return found;
 		}
 
 		private IEnumerable<TLine> GetLinesOfType<TLine>()
@@ -86,14 +88,23 @@
 		{
 			public EditContext(IniSectionData section)
 			{
-				Section = section;
+				Section = section ?? throw new ArgumentNullException(nameof(section));
+
+				Lines.AddRange(section._lines);
 			}
 
 			public IniSectionData Section { get; }
 
-			public void Add(IniProperty iniProperty)
+			public List<IniLineData> Lines { get; } = new List<IniLineData>();
+
+			public void Add(IniLineData line)
 			{
-				throw new NotImplementedException();
+				if (line is null)
+				{
+					throw new ArgumentNullException(nameof(line));
+				}
+
+				Lines.Add(line);
 			}
 
 			/// <inheritdoc />

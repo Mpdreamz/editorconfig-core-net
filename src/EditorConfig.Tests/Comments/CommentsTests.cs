@@ -32,7 +32,7 @@
             var file = GetFileFromMethod(MethodBase.GetCurrentMethod(), FileName);
             EditorConfigFile editorConfigFile = new EditorConfigFile(file);
 
-            editorConfigFile.TryFindComment(GlobalCommentText, editorConfigFile.Global, out var comment).Should().BeTrue();
+            editorConfigFile.TryGetComment(GlobalCommentText, editorConfigFile.Global, out var comment).Should().BeTrue();
 
             comment!.Line.Text.Should().Be(GlobalCommentText);
             comment.LineNumber.Should().Be(3);
@@ -44,7 +44,7 @@
             var file = GetFileFromMethod(MethodBase.GetCurrentMethod(), FileName);
             EditorConfigFile editorConfigFile = new EditorConfigFile(file);
 
-            editorConfigFile.TryFindComment("Not a real comment", editorConfigFile.Global, out var comment).Should().BeFalse();
+            editorConfigFile.TryGetComment("Not a real comment", editorConfigFile.Global, out var comment).Should().BeFalse();
 
             comment.Should().BeNull();
         }
@@ -56,10 +56,10 @@
             EditorConfigFile editorConfigFile = new EditorConfigFile(file);
 
             var section = editorConfigFile.Sections[0];
-            editorConfigFile.TryFindComment(SectionCommentText, section, out var comment).Should().BeTrue();
+            editorConfigFile.TryGetComment(SectionCommentText, section, out var comment).Should().BeTrue();
 
             comment!.Line.Text.Should().Be(SectionCommentText);
-            comment.LineNumber.Should().Be(8);
+            comment.LineNumber.Should().Be(7);
         }
 
         [Test]
@@ -69,7 +69,7 @@
             EditorConfigFile editorConfigFile = new EditorConfigFile(file);
 
             var section = editorConfigFile.Sections[0];
-            editorConfigFile.TryFindComment("Not a real comment", section, out var comment).Should().BeFalse();
+            editorConfigFile.TryGetComment("Not a real comment", section, out var comment).Should().BeFalse();
 
             comment.Should().BeNull();
         }
