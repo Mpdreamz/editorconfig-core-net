@@ -174,7 +174,7 @@
 				return;
 			}
 
-			if (bool.TryParse(rootProp.Line.Value, out var isRoot))
+			if (bool.TryParse(rootProp.Data.Value, out var isRoot))
 			{
 				IsRoot = isRoot;
 			}
@@ -195,15 +195,14 @@
 		{
 			private readonly EditorConfigFile _editorConfigFile;
 
-			private readonly FileStream _lock;
+			private FileStream _lock;
 
 			private readonly List<string> _lines;
 
 			public EditContext(EditorConfigFile editorConfigFile)
 			{
 				_editorConfigFile = editorConfigFile ?? throw new ArgumentNullException(nameof(editorConfigFile));
-
-				_lock = File.OpenWrite(editorConfigFile.FullPath);
+				_lock = CreateLock();
 
 				// Make a copy of the data for editing
 				_lines = _editorConfigFile._lines.ToList();
@@ -240,13 +239,15 @@
 					}
 				}
 
-				string fullText = string.Join(Environment.NewLine, _lines);
-
-				var bytes = _editorConfigFile._encoding.GetBytes(fullText);
-
-				var length = Math.Max(bytes.Length, _lock.Length);
-
-				_lock.Write(bytes, 0, bytes.Length);
+				_lock.Dispose();
+				try
+				{
+					File.WriteAllLines(_editorConfigFile.FullPath, _lines, _editorConfigFile._encoding);
+				}
+				finally
+				{
+					_lock = CreateLock();
+				}
 
 				// Replace the file class' data if the operation is successful
 				_editorConfigFile.ResetTo(_lines);
@@ -261,6 +262,8 @@
 
 				_lock.Dispose();
 			}
+
+			private FileStream CreateLock() => File.OpenWrite(_editorConfigFile.FullPath);
 		}
 	}
 }

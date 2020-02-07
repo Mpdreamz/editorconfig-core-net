@@ -5,39 +5,39 @@
     public class IniLine<T> : IniLine
         where T : IniLineData
     {
-        public IniLine(int lineNumber, T line)
-            : base(lineNumber, line)
+        public IniLine(int lineNumber, T data)
+            : base(lineNumber, data)
         {
             if (lineNumber <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(lineNumber));
             }
 
-            Line = line;
+            Data = data;
         }
 
-        public T Line { get; }
+        public T Data { get; }
 
         /// <inheritdoc />
-        public override IniLineData GetLineData() => Line;
+        public override IniLineData GetLineData() => Data;
     }
 
     public abstract class IniLine
     {
-        protected IniLine(int lineNumber, IniLineData line)
+        protected IniLine(int lineNumber, IniLineData data)
         {
 	        if (lineNumber <= 0)
 	        {
 		        throw new ArgumentOutOfRangeException(nameof(lineNumber));
 			}
 
-			if (line == null)
+			if (data == null)
 			{
-				throw new ArgumentNullException(nameof(line));
+				throw new ArgumentNullException(nameof(data));
 			}
 
 			LineNumber = lineNumber;
-            LineType = line.LineType;
+            LineType = data.LineType;
         }
 
         public int LineNumber { get; }

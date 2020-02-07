@@ -34,7 +34,7 @@
 
             editorConfigFile.TryGetComment(GlobalCommentText, editorConfigFile.Global, out var comment).Should().BeTrue();
 
-            comment!.Line.Text.Should().Be(GlobalCommentText);
+            comment!.Data.Text.Should().Be(GlobalCommentText);
             comment.LineNumber.Should().Be(3);
         }
 
@@ -58,7 +58,7 @@
             var section = editorConfigFile.Sections[0];
             editorConfigFile.TryGetComment(SectionCommentText, section, out var comment).Should().BeTrue();
 
-            comment!.Line.Text.Should().Be(SectionCommentText);
+            comment!.Data.Text.Should().Be(SectionCommentText);
             comment.LineNumber.Should().Be(7);
         }
 

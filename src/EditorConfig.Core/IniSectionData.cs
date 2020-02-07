@@ -1,6 +1,7 @@
 ﻿namespace EditorConfig.Core
 {
 	using System;
+	using System.Collections;
 	using System.Collections.Generic;
 	using System.Diagnostics.CodeAnalysis;
 	using System.Linq;
@@ -84,8 +85,10 @@
 			where TLine : IniLineData =>
 			_lines.OfType<TLine>();
 
-		public class EditContext : List<IniLineData>
+		public class EditContext
 		{
+			private readonly List<IniLineData> _list = new List<IniLineData>();
+
 			public EditContext(IniSectionData section)
 			{
 				Section = section ?? throw new ArgumentNullException(nameof(section));
@@ -95,7 +98,48 @@
 
 			public IniSectionData Section { get; }
 
-			public IReadOnlyList<IniLineData> Lines => this;
+			public IReadOnlyList<IniLineData> Lines => _list;
+
+			public int Count => _list.Count;
+
+			public void Add(IniLineData item) => _list.Add(item);
+
+			public void AddRange(IEnumerable<IniLineData> items) => _list.AddRange(items);
+
+			public void Clear() => _list.Clear();
+
+			public bool Contains(IniLineData item) => _list.Contains(item);
+
+			public void CopyTo(IniLineData[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
+
+			public int IndexOf(IniLineData item) => _list.IndexOf(item);
+
+			public void Insert(int index, IniLineData item) => _list.Insert(index, item);
+
+			public bool Remove(IniLine line)
+			{
+				if (line is null)
+				{
+					throw new ArgumentNullException(nameof(line));
+				}
+
+				return _list.Remove(line.GetLineData());
+			}
+
+			public void RemoveRange(IEnumerable<IniLine> lines)
+			{
+				if (lines is null)
+				{
+					throw new ArgumentNullException(nameof(lines));
+				}
+
+				foreach (var line in lines)
+				{
+					Remove(line);
+				}
+			}
+
+			public void RemoveAt(int index) => _list.RemoveAt(index);
 		}
 	}
 }
