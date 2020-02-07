@@ -234,12 +234,12 @@
 				_lines = _editorConfigFile._lines.ToList();
 
 				Global = new SectionEditContext(_editorConfigFile.Global);
-				Sections = _editorConfigFile.Sections.Select(s => new SectionEditContext(s)).ToList();
+				Sections = _editorConfigFile.Sections.ToDictionary(s => s.Name, s => new SectionEditContext(s));
 			}
 
 			public SectionEditContext Global { get; }
 
-			public List<SectionEditContext> Sections { get; }
+			public Dictionary<string, SectionEditContext> Sections { get; }
 
 			public void AddSection(IniSectionData sectionData)
 			{
@@ -249,7 +249,7 @@
 				}
 
 				var sectionEdit = new SectionEditContext(sectionData);
-				Sections.Add(sectionEdit);
+				Sections.Add(sectionData.Name, sectionEdit);
 			}
 
 			/// <inheritdoc />
@@ -268,7 +268,7 @@
 					_lines.Add(line.ToString());
 				}
 
-				foreach (var section in Sections)
+				foreach (var section in Sections.Values)
 				{
 					foreach (var line in section)
 					{

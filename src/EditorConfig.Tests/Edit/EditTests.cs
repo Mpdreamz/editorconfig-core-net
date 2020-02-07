@@ -23,9 +23,11 @@
 
 			var iniProperty = new IniPropertyData(TestPropertyKey, TestPropertyValue);
 
+			var sectionName = editorConfigFile.Sections[TestSection].Name;
+
 			using (var editContext = editorConfigFile.Edit())
 			{
-				editContext.Sections[TestSection].Add(iniProperty);
+				editContext.Sections[sectionName].Add(iniProperty);
 			}
 
 			var originalText = File.ReadAllText(file);
@@ -75,15 +77,18 @@
 			const string TestPropertyKey = "testProperty";
 			const string TestPropertyValue = "testValue";
 
+			var section = editorConfigFile.Sections[TestSection];
+			var sectionName = section.Name;
+
 			// Find aftercomment property line
-			editorConfigFile.TryGetProperty("aftercomment", editorConfigFile.Sections[TestSection], out var prop).Should().BeTrue();
+			editorConfigFile.TryGetProperty("aftercomment", section, out var prop).Should().BeTrue();
 			var lineNumber = prop!.LineNumber;
 
 			var iniProperty = new IniPropertyData(TestPropertyKey, TestPropertyValue);
 
 			using (var editContext = editorConfigFile.Edit())
 			{
-				editContext.Sections[TestSection].Add(iniProperty);
+				editContext.Sections[sectionName].Add(iniProperty);
 
 				editContext.SaveChanges();
 			}
@@ -109,11 +114,12 @@
 			const int TestSection = 0;
 
 			// Find number of lines in section
-			var sectionLength = editorConfigFile.Sections[0].Length;
+			var sectionLength = editorConfigFile.Sections[TestSection].Length;
+			var sectionName = editorConfigFile.Sections[TestSection].Name;
 
 			using (var editContext = editorConfigFile.Edit())
 			{
-				editContext.Sections.RemoveAt(TestSection);
+				editContext.Sections.Remove(sectionName);
 
 				editContext.SaveChanges();
 			}
@@ -133,6 +139,7 @@
 			EditorConfigFile editorConfigFile = PrepareTest("remove", out var file, out var workingFile);
 
 			const int TestSection = 0;
+			var sectionName = editorConfigFile.Sections[TestSection].Name;
 
 			// Find aftercomment property line
 			editorConfigFile.TryGetProperty("aftercomment", editorConfigFile.Sections[TestSection], out var afterProp).Should().BeTrue();
@@ -142,7 +149,7 @@
 			editorConfigFile.TryGetProperty("beforecomment", editorConfigFile.Sections[TestSection], out var prop).Should().BeTrue();
 			using (var editContext = editorConfigFile.Edit())
 			{
-				editContext.Sections[TestSection].Remove(prop!).Should().BeTrue();
+				editContext.Sections[sectionName].Remove(prop!).Should().BeTrue();
 
 				editContext.SaveChanges();
 			}
