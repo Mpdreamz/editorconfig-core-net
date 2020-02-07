@@ -8,7 +8,7 @@
 		public IniLine(int lineNumber, T data)
 			: base(lineNumber, data)
 		{
-			if (lineNumber <= 0)
+			if (lineNumber < 0)
 			{
 				throw new ArgumentOutOfRangeException(nameof(lineNumber));
 			}
@@ -26,7 +26,7 @@
 	{
 		protected IniLine(int lineNumber, IniLineData data)
 		{
-			if (lineNumber <= 0)
+			if (lineNumber < 0)
 			{
 				throw new ArgumentOutOfRangeException(nameof(lineNumber));
 			}

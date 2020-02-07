@@ -19,7 +19,7 @@
 
 		private readonly Regex _property = new Regex(@"^\s*([\w\.\-_]+)\s*[=:]\s*(.*?)\s*([#;].*)?$");
 
-		private readonly Dictionary<int, IniSectionData> _sections = new Dictionary<int, IniSectionData>();
+		private readonly Dictionary<string, IniLine<IniSectionData>> _sections = new Dictionary<string, IniLine<IniSectionData>>();
 
 		private readonly List<string> _lines = new List<string>();
 
@@ -69,7 +69,7 @@
 		/// </summary>
 		public Version ParseVersion { get; }
 
-		public IReadOnlyList<IniSectionData> Sections => _sections.Values.ToList();
+		public IReadOnlyList<IniSectionData> Sections => _sections.Values.Select(s => s.Data).ToList();
 
 		public EditContext Edit()
 		{
@@ -94,9 +94,7 @@
 				return false;
 			}
 
-			var baseLineNumber = section.IsGlobal ? 0 : _sections.First(kvp => ReferenceEquals(kvp.Value, section)).Key;
-
-			var lineNumber = baseLineNumber + offset + 1;
+			var lineNumber = GetLineNumber(section, offset);
 
 			comment = new IniLine<IniComment>(lineNumber, commentData);
 			return true;
@@ -120,13 +118,18 @@
 				return false;
 			}
 
-			var baseLineNumber = section.IsGlobal ? 0 : _sections.First(kvp => ReferenceEquals(kvp.Value, section)).Key;
-
-			var lineNumber = baseLineNumber + offset + 1;
+			var lineNumber = GetLineNumber(section, offset);
 
 			property = new IniLine<IniProperty>(lineNumber, propertyData);
 			return true;
 		}
+
+		public bool TryGetSection(string name, [NotNullWhen(true)] out IniLine<IniSectionData>? section) => _sections.TryGetValue(name, out section);
+
+		private int GetSectionLineNumber(IniSectionData section) =>
+					section.IsGlobal ? 0 : _sections[section.Name].LineNumber;
+
+		private int GetLineNumber(IniSectionData section, int offset) => GetSectionLineNumber(section) + offset + 1;
 
 		private void Parse()
 		{
@@ -168,7 +171,9 @@
 						var sectionName = matches[0].Groups[1].Value;
 						activeSection = new IniSectionData(sectionName);
 
-						_sections.Add(currentLineNumber, activeSection);
+						var iniSection = new IniLine<IniSectionData>(currentLineNumber, activeSection);
+
+						_sections.Add(sectionName, iniSection);
 						continue;
 					}
 
