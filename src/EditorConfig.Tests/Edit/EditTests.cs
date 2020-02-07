@@ -35,6 +35,38 @@
 		}
 
 		[Test]
+		public void AddSectionWorks()
+		{
+			EditorConfigFile editorConfigFile = PrepareTest("addsection", out var file, out var workingFile);
+
+			IniSectionData iniSectionData = new IniSectionData("*.cs")
+			{
+				new IniComment("TEST ADDED SECTION"),
+				new IniProperty("testProperty", "testValue"),
+				new IniEmptyLine(),
+				new IniComment("ANOTHER COMMENT"),
+				new IniProperty("anotherProperty", "anotherValue")
+			};
+
+			var sectionLength = iniSectionData.Length;
+
+			using (var editContext = editorConfigFile.Edit())
+			{
+				editContext.AddSection(iniSectionData);
+
+				editContext.SaveChanges();
+			}
+
+			editorConfigFile.Sections.Count.Should().Be(2);
+
+			// Confirm the file is one line longer
+			var fileLength = File.ReadAllLines(file).Length;
+			var workingFileLength = File.ReadAllLines(workingFile).Length;
+
+			workingFileLength.Should().Be(fileLength + sectionLength);
+		}
+
+		[Test]
         public void AddWorks()
         {
             EditorConfigFile editorConfigFile = PrepareTest("add", out var file, out var workingFile);
@@ -67,6 +99,32 @@
 			var workingFileLength = File.ReadAllLines(workingFile).Length;
 
 			workingFileLength.Should().Be(fileLength + 1);
+		}
+
+		[Test]
+		public void RemoveSectionWorks()
+		{
+			EditorConfigFile editorConfigFile = PrepareTest("removesection", out var file, out var workingFile);
+
+			const int TestSection = 0;
+
+			// Find number of lines in section
+			var sectionLength = editorConfigFile.Sections[0].Length;
+
+			using (var editContext = editorConfigFile.Edit())
+			{
+				editContext.Sections.RemoveAt(TestSection);
+
+				editContext.SaveChanges();
+			}
+
+			editorConfigFile.Sections.Count.Should().Be(0);
+
+			// Confirm the file is shorter by the number of removed lines
+			var fileLength = File.ReadAllLines(file).Length;
+			var workingFileLength = File.ReadAllLines(workingFile).Length;
+
+			workingFileLength.Should().Be(fileLength - sectionLength);
 		}
 
 		[Test]

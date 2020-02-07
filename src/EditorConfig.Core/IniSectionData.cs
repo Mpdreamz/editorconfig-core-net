@@ -9,7 +9,7 @@
 	/// <summary>
 	///     Represents an ini section within the editorconfig file
 	/// </summary>
-	public class IniSectionData : IniLineData
+	public class IniSectionData : IniLineData, IEnumerable<IniLineData>
 	{
 		private readonly List<IniLineData> _lines = new List<IniLineData>();
 
@@ -35,9 +35,14 @@
 
 		public string Name { get; }
 
+		public int Length => _lines.Count;
+
 		public IEnumerable<IniProperty> Properties => GetLinesOfType<IniProperty>();
 
 		public static IniSectionData Global() => new IniSectionData();
+
+		// AddLine is nicer syntax, this is here so collection initializers can be used
+		public void Add(IniLineData iniLine) => AddLine(iniLine);
 
 		public void AddLine(IniLineData iniLine)
 		{
@@ -58,6 +63,8 @@
 		}
 
 		public EditContext Edit() => new EditContext(this);
+
+		public IEnumerator<IniLineData> GetEnumerator() => _lines.GetEnumerator();
 
 		/// <inheritdoc />
 		public override string ToString() => $"[{Name}]";
@@ -80,6 +87,8 @@
 			offset = _lines.IndexOf(prop);
 			return found;
 		}
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 		private IEnumerable<TLine> GetLinesOfType<TLine>()
 			where TLine : IniLineData =>

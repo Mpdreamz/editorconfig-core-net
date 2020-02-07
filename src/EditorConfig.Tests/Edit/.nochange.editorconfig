@@ -1,9 +1,10 @@
 root=true
 
 # GLOBAL COMMENT
-something=something
 
 [*]
+something=something
+
 beforecomment=true
 # SECTION COMMENT
 aftercomment=hello

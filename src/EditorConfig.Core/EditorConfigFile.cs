@@ -213,7 +213,18 @@
 
 			public IniSectionData.EditContext Global { get; }
 
-			public IReadOnlyList<IniSectionData.EditContext> Sections { get; }
+			public List<IniSectionData.EditContext> Sections { get; }
+
+			public void AddSection(IniSectionData sectionData)
+			{
+				if (sectionData is null)
+				{
+					throw new ArgumentNullException(nameof(sectionData));
+				}
+
+				var sectionEdit = new IniSectionData.EditContext(sectionData);
+				Sections.Add(sectionEdit);
+			}
 
 			/// <inheritdoc />
 			public void Dispose()
