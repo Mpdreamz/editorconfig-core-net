@@ -241,7 +241,7 @@
 
 			public Dictionary<string, SectionEditContext> Sections { get; }
 
-			public void AddSection(IniSectionData sectionData)
+			public SectionEditContext AddSection(IniSectionData sectionData)
 			{
 				if (sectionData is null)
 				{
@@ -250,6 +250,8 @@
 
 				var sectionEdit = new SectionEditContext(sectionData);
 				Sections.Add(sectionData.Name, sectionEdit);
+
+				return sectionEdit;
 			}
 
 			/// <inheritdoc />
