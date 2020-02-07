@@ -25,7 +25,7 @@
 
 		private readonly Encoding _encoding;
 
-		public EditorConfigFile(string file, Encoding? encoding = null)
+		public EditorConfigFile(string file, Encoding? encoding = null, Version? developmentVersion = null)
 		{
 			if (string.IsNullOrWhiteSpace(file))
 			{
@@ -47,16 +47,27 @@
 
 			Global = IniSectionData.Global();
 
+			ParseVersion = developmentVersion ?? EditorConfigParser.Version;
+
 			Parse();
+
+			FileConfiguration = new FileConfiguration(ParseVersion, file, Global.Properties.ToDictionary(p => p.Key, p => p.Value));
 		}
 
 		public string Directory { get; }
+
+		public FileConfiguration FileConfiguration { get; }
 
 		public string FullPath { get; }
 
 		public IniSectionData Global { get; private set; }
 
 		public bool IsRoot { get; private set; }
+
+		/// <summary>
+		/// The editor config parser version in use, defaults to latest <see cref="EditorConfigParser.Version"/>
+		/// </summary>
+		public Version ParseVersion { get; }
 
 		public IReadOnlyList<IniSectionData> Sections => _sections.Values.ToList();
 
