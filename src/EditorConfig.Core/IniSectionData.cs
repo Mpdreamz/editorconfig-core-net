@@ -59,6 +59,12 @@
 			}
 
 			var prop = (IniProperty)iniLine;
+
+			if (IsGlobal && prop.Key != "root")
+			{
+				throw new InvalidOperationException("Only the root property can be added to the global section");
+			}
+
 			_propertyDictionary.Add(prop.Key, prop);
 		}
 
