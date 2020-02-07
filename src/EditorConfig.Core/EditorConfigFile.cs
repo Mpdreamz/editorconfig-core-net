@@ -254,6 +254,17 @@
 				return sectionEdit;
 			}
 
+			public SectionEditContext GetOrAddSection(string sectionName)
+			{
+				// Create or retrieve the section name
+				if (!Sections.TryGetValue(sectionName, out var sectionEditContext))
+				{
+					return AddSection(new IniSectionData(sectionName));
+				}
+
+				return sectionEditContext;
+			}
+
 			/// <inheritdoc />
 			public void Dispose()
 			{
