@@ -207,13 +207,13 @@
 				// Make a copy of the data for editing
 				_lines = _editorConfigFile._lines.ToList();
 
-				Global = new IniSectionData.EditContext(_editorConfigFile.Global);
-				Sections = _editorConfigFile.Sections.Select(s => new IniSectionData.EditContext(s)).ToList();
+				Global = new SectionEditContext(_editorConfigFile.Global);
+				Sections = _editorConfigFile.Sections.Select(s => new SectionEditContext(s)).ToList();
 			}
 
-			public IniSectionData.EditContext Global { get; }
+			public SectionEditContext Global { get; }
 
-			public List<IniSectionData.EditContext> Sections { get; }
+			public List<SectionEditContext> Sections { get; }
 
 			public void AddSection(IniSectionData sectionData)
 			{
@@ -222,7 +222,7 @@
 					throw new ArgumentNullException(nameof(sectionData));
 				}
 
-				var sectionEdit = new IniSectionData.EditContext(sectionData);
+				var sectionEdit = new SectionEditContext(sectionData);
 				Sections.Add(sectionEdit);
 			}
 
@@ -237,14 +237,14 @@
 			{
 				_lines.Clear();
 
-				foreach (var line in Global.Lines)
+				foreach (var line in Global)
 				{
 					_lines.Add(line.ToString());
 				}
 
 				foreach (var section in Sections)
 				{
-					foreach (var line in section.Lines)
+					foreach (var line in section)
 					{
 						_lines.Add(line.ToString());
 					}

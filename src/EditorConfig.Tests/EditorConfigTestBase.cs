@@ -61,9 +61,9 @@
 			var cwd = Environment.CurrentDirectory;
 
 			return Path.Combine(
-			                    cwd.Replace(OutputPath("Release"), "", StringComparison.Ordinal)
-				                    .Replace(OutputPath("Debug"), "", StringComparison.Ordinal),
-			                    file);
+								cwd.Replace(OutputPath("Release"), "", StringComparison.Ordinal)
+									.Replace(OutputPath("Debug"), "", StringComparison.Ordinal),
+								file);
 
 			string OutputPath(string configuration) => $"bin{folderSep}netcoreapp3.1{folderSep}{configuration}";
 		}

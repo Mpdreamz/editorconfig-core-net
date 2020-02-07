@@ -1,34 +1,34 @@
 ﻿namespace EditorConfig.Core
 {
-    using System;
+	using System;
 
-    public class IniLine<T> : IniLine
-        where T : IniLineData
-    {
-        public IniLine(int lineNumber, T data)
-            : base(lineNumber, data)
-        {
-            if (lineNumber <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(lineNumber));
-            }
+	public class IniLine<T> : IniLine
+		where T : IniLineData
+	{
+		public IniLine(int lineNumber, T data)
+			: base(lineNumber, data)
+		{
+			if (lineNumber <= 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(lineNumber));
+			}
 
-            Data = data;
-        }
+			Data = data;
+		}
 
-        public T Data { get; }
+		public T Data { get; }
 
-        /// <inheritdoc />
-        public override IniLineData GetLineData() => Data;
-    }
+		/// <inheritdoc />
+		public override IniLineData GetLineData() => Data;
+	}
 
-    public abstract class IniLine
-    {
-        protected IniLine(int lineNumber, IniLineData data)
-        {
-	        if (lineNumber <= 0)
-	        {
-		        throw new ArgumentOutOfRangeException(nameof(lineNumber));
+	public abstract class IniLine
+	{
+		protected IniLine(int lineNumber, IniLineData data)
+		{
+			if (lineNumber <= 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(lineNumber));
 			}
 
 			if (data == null)
@@ -37,13 +37,13 @@
 			}
 
 			LineNumber = lineNumber;
-            LineType = data.LineType;
-        }
+			LineType = data.LineType;
+		}
 
-        public int LineNumber { get; }
+		public int LineNumber { get; }
 
-        public IniLineType LineType { get; }
+		public IniLineType LineType { get; }
 
-        public abstract IniLineData GetLineData();
-    }
+		public abstract IniLineData GetLineData();
+	}
 }

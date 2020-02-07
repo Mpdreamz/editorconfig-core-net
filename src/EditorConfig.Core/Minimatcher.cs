@@ -152,7 +152,7 @@ namespace EditorConfig.Core
 
         list1.Add(parsedSet);
 
-        nextG: ;
+        nextG:;
       }
 
       return new GlobMatcher(options, list1, negate);
