@@ -11,7 +11,7 @@
 	/// </summary>
 	public class IniSectionData : IniLineData, IEnumerable<IniLineData>
 	{
-		private readonly Dictionary<string, IniProperty> _propertyDictionary = new Dictionary<string, IniProperty>();
+		private readonly Dictionary<string, IniPropertyData> _propertyDictionary = new Dictionary<string, IniPropertyData>();
 
 		public IniSectionData(string name)
 			: base(IniLineType.SectionHeader)
@@ -46,7 +46,7 @@
 			IsGlobal = true;
 		}
 
-		public IEnumerable<IniComment> Comments => GetLinesOfType<IniComment>();
+		public IEnumerable<(IniComment Prop, int Offset)> Comments => GetLinesOfType<IniComment>();
 
 		public bool IsGlobal { get; }
 
@@ -54,7 +54,7 @@
 
 		public int Length => Lines.Count;
 
-		public IEnumerable<IniProperty> Properties => GetLinesOfType<IniProperty>();
+		public IEnumerable<(IniPropertyData Prop, int Offset)> Properties => GetLinesOfType<IniPropertyData>();
 
 		protected List<IniLineData> Lines { get; } = new List<IniLineData>();
 
@@ -77,7 +77,7 @@
 				return;
 			}
 
-			var prop = (IniProperty)iniLine;
+			var prop = (IniPropertyData)iniLine;
 
 			if (IsGlobal && prop.Key != "root")
 			{
@@ -104,14 +104,13 @@
 				throw new ArgumentException("message", nameof(commentText));
 			}
 
-			comment = Comments.FirstOrDefault(c => c.Text.Equals(commentText, StringComparison.OrdinalIgnoreCase));
-			offset = Lines.IndexOf(comment);
+			(comment, offset) = Comments.FirstOrDefault(c => c.Prop.Text.Equals(commentText, StringComparison.OrdinalIgnoreCase));
 			return comment != null;
 		}
 
 		internal bool TryGetProperty(
 			string key,
-			[NotNullWhen(true)] out IniProperty? prop,
+			[NotNullWhen(true)] out IniPropertyData? prop,
 			out int offset)
 		{
 			var found = _propertyDictionary.TryGetValue(key, out prop);
@@ -121,8 +120,8 @@
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-		private IEnumerable<TLine> GetLinesOfType<TLine>()
+		private IEnumerable<(TLine Line, int Offset)> GetLinesOfType<TLine>()
 			where TLine : IniLineData =>
-			Lines.OfType<TLine>();
+			Lines.OfType<TLine>().Select(l => (l, Lines.IndexOf(l)));
 	}
 }

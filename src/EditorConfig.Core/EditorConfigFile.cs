@@ -51,7 +51,7 @@
 
 			Parse();
 
-			FileConfiguration = new FileConfiguration(ParseVersion, file, Global.Properties.ToDictionary(p => p.Key, p => p.Value));
+			FileConfiguration = new FileConfiguration(ParseVersion, file, Global.Properties.ToDictionary(p => p.Prop.Key, p => p.Prop.Value));
 		}
 
 		public string Directory { get; }
@@ -74,6 +74,16 @@
 		public EditContext Edit()
 		{
 			return new EditContext(this);
+		}
+
+		public IEnumerable<IniLine<IniPropertyData>> GetSectionProperties(IniSectionData section)
+		{
+			if (section is null)
+			{
+				throw new ArgumentNullException(nameof(section));
+			}
+
+			return section.Properties.Select(tuple => new IniLine<IniPropertyData>(GetLineNumber(section, tuple.Offset), tuple.Prop));
 		}
 
 		public bool TryGetComment(string commentText, IniSectionData section, [NotNullWhen(true)] out IniLine<IniComment>? comment)
@@ -100,7 +110,7 @@
 			return true;
 		}
 
-		public bool TryGetProperty(string key, IniSectionData section, [NotNullWhen(true)] out IniLine<IniProperty>? property)
+		public bool TryGetProperty(string key, IniSectionData section, [NotNullWhen(true)] out IniLine<IniPropertyData>? property)
 		{
 			if (string.IsNullOrWhiteSpace(key))
 			{
@@ -120,7 +130,7 @@
 
 			var lineNumber = GetLineNumber(section, offset);
 
-			property = new IniLine<IniProperty>(lineNumber, propertyData);
+			property = new IniLine<IniPropertyData>(lineNumber, propertyData);
 			return true;
 		}
 
@@ -159,7 +169,7 @@
 						var key = matches[0].Groups[1].Value.Trim();
 						var value = matches[0].Groups[2].Value.Trim();
 
-						var prop = new IniProperty(key, value);
+						var prop = new IniPropertyData(key, value);
 
 						activeSection.AddLine(prop);
 						continue;

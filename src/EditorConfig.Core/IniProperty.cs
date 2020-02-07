@@ -1,8 +1,8 @@
 ﻿namespace EditorConfig.Core
 {
-	public class IniProperty : IniLineData
+	public class IniPropertyData : IniLineData
 	{
-		public IniProperty(string key, string value)
+		public IniPropertyData(string key, string value)
 			: base(IniLineType.Property)
 		{
 			Key = key;

@@ -21,7 +21,7 @@
 			const string TestPropertyKey = "testProperty";
 			const string TestPropertyValue = "testValue";
 
-			var iniProperty = new IniProperty(TestPropertyKey, TestPropertyValue);
+			var iniProperty = new IniPropertyData(TestPropertyKey, TestPropertyValue);
 
 			using (var editContext = editorConfigFile.Edit())
 			{
@@ -42,10 +42,10 @@
 			IniSectionData iniSectionData = new IniSectionData("*.cs")
 			{
 				new IniComment("TEST ADDED SECTION"),
-				new IniProperty("testProperty", "testValue"),
+				new IniPropertyData("testProperty", "testValue"),
 				new IniEmptyLine(),
 				new IniComment("ANOTHER COMMENT"),
-				new IniProperty("anotherProperty", "anotherValue")
+				new IniPropertyData("anotherProperty", "anotherValue")
 			};
 
 			var sectionLength = iniSectionData.Length;
@@ -79,7 +79,7 @@
 			editorConfigFile.TryGetProperty("aftercomment", editorConfigFile.Sections[TestSection], out var prop).Should().BeTrue();
 			var lineNumber = prop!.LineNumber;
 
-			var iniProperty = new IniProperty(TestPropertyKey, TestPropertyValue);
+			var iniProperty = new IniPropertyData(TestPropertyKey, TestPropertyValue);
 
 			using (var editContext = editorConfigFile.Edit())
 			{
@@ -159,9 +159,6 @@
 
 			workingFileLength.Should().Be(fileLength - 1);
 		}
-
-		private static EditorConfigFile PrepareTest(string filename) =>
-			PrepareTest(filename, out _, out _);
 
 		private static EditorConfigFile PrepareTest(
 			string filename,
