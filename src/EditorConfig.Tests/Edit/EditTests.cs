@@ -52,7 +52,7 @@
 
 			var sectionLength = iniSectionData.Length;
 
-			using (var editContext = editorConfigFile.Edit())
+			using (var editContext = editorConfigFile.Edit(new EditorConfigFileOptions { EndSectionWithBlankLineOrComment = false }))
 			{
 				editContext.AddSection(iniSectionData);
 
@@ -62,8 +62,10 @@
 			editorConfigFile.Sections.Count.Should().Be(2);
 
 			// Confirm the file is one line longer
-			var fileLength = File.ReadAllLines(file).Length;
-			var workingFileLength = File.ReadAllLines(workingFile).Length;
+			string[] fileText = File.ReadAllLines(file);
+			var fileLength = fileText.Length;
+			string[] workingFileText = File.ReadAllLines(workingFile);
+			var workingFileLength = workingFileText.Length;
 
 			workingFileLength.Should().Be(fileLength + sectionLength);
 		}
@@ -86,7 +88,7 @@
 
 			var iniProperty = new IniPropertyData(TestPropertyKey, TestPropertyValue);
 
-			using (var editContext = editorConfigFile.Edit())
+			using (var editContext = editorConfigFile.Edit(new EditorConfigFileOptions { EndSectionWithBlankLineOrComment = false }))
 			{
 				editContext.Sections[sectionName].Add(iniProperty);
 
@@ -147,7 +149,7 @@
 
 			// Remove beforecommment
 			editorConfigFile.TryGetProperty("beforecomment", editorConfigFile.Sections[TestSection], out var prop).Should().BeTrue();
-			using (var editContext = editorConfigFile.Edit())
+			using (var editContext = editorConfigFile.Edit(new EditorConfigFileOptions { EndSectionWithBlankLineOrComment = false }))
 			{
 				editContext.Sections[sectionName].Remove(prop!).Should().BeTrue();
 

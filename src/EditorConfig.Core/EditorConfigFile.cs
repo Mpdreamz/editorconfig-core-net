@@ -71,9 +71,9 @@
 
 		public IReadOnlyList<IniSectionData> Sections => _sections.Values.Select(s => s.Data).ToList();
 
-		public EditContext Edit(bool allowConsecutiveEmptyLines = false)
+		public EditContext Edit(EditorConfigFileOptions? options = null)
 		{
-			return new EditContext(this, allowConsecutiveEmptyLines);
+			return new EditContext(this, options);
 		}
 
 		public IEnumerable<IniLine<IniPropertyData>> GetSectionProperties(IniSectionData section)
@@ -216,15 +216,16 @@
 		public class EditContext : IDisposable
 		{
 			private readonly EditorConfigFile _editorConfigFile;
-			private readonly bool _allowConsecutiveEmptyLines;
+			private readonly EditorConfigFileOptions _options;
 			private FileStream _lock;
 
 			private readonly List<string> _lines;
 
-			public EditContext(EditorConfigFile editorConfigFile, bool allowConsecutiveEmptyLines = false)
+			public EditContext(EditorConfigFile editorConfigFile, EditorConfigFileOptions? options = null)
 			{
 				_editorConfigFile = editorConfigFile ?? throw new ArgumentNullException(nameof(editorConfigFile));
-				_allowConsecutiveEmptyLines = allowConsecutiveEmptyLines;
+				_options = options ?? new EditorConfigFileOptions();
+
 				_lock = CreateLock();
 
 				// Make a copy of the data for editing
@@ -280,9 +281,19 @@
 
 				foreach (var section in Sections.Values)
 				{
+					IniLineData? lastLine = null;
 					foreach (var line in section)
 					{
+						lastLine = line;
 						WriteLine(line);
+					}
+
+					// Ensure sections end with a comment or a blank line
+					IniLineType? lineType = lastLine?.LineType;
+
+					if (_options.EndSectionWithBlankLineOrComment && lineType != IniLineType.Comment && lineType != IniLineType.None)
+					{
+						WriteLine(new IniEmptyLine());
 					}
 				}
 
@@ -302,7 +313,7 @@
 
 			private void WriteLine(IniLineData line)
 			{
-				if (!_allowConsecutiveEmptyLines && line.LineType == IniLineType.None && string.IsNullOrWhiteSpace(_lines.Last()))
+				if (!_options.AllowConsecutiveEmptyLines && line.LineType == IniLineType.None && string.IsNullOrWhiteSpace(_lines.Last()))
 				{
 					return;
 				}
