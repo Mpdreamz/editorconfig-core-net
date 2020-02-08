@@ -43,10 +43,10 @@
 
 			IniSectionData iniSectionData = new IniSectionData("*.cs")
 			{
-				new IniComment("TEST ADDED SECTION"),
+				new IniCommentData("TEST ADDED SECTION"),
 				new IniPropertyData("testProperty", "testValue"),
 				new IniEmptyLine(),
-				new IniComment("ANOTHER COMMENT"),
+				new IniCommentData("ANOTHER COMMENT"),
 				new IniPropertyData("anotherProperty", "anotherValue")
 			};
 

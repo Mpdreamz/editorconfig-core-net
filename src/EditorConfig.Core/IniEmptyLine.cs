@@ -1,17 +1,18 @@
-﻿namespace EditorConfig.Core
+﻿using System.Text.RegularExpressions;
+
+namespace EditorConfig.Core
 {
 	public class IniEmptyLine : IniLineData
 	{
 		/// <inheritdoc />
 		public IniEmptyLine()
-			: base(IniLineType.None)
+			: base(IniLineType.None, null)
 		{
 		}
 
+		public override Regex LineRegex { get; } = new Regex(string.Empty);
+
 		/// <inheritdoc />
-		public override string ToString()
-		{
-			return string.Empty;
-		}
+		protected override string ToLine() => string.Empty;
 	}
 }

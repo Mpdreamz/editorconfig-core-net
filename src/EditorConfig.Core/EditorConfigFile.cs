@@ -13,11 +13,11 @@
 	/// </summary>
 	public class EditorConfigFile
 	{
-		private readonly Regex _section = new Regex(@"^\s*\[(([^#;]|\\#|\\;)+)\]\s*([#;].*)?$");
+		public static readonly Regex SectionRegex = new Regex(@"^\s*\[(([^#;]|\\#|\\;)+)\]\s*([#;].*)?$");
 
-		private readonly Regex _comment = new Regex(@"^\s*[#;](.*)");
+		public static readonly Regex CommentRegex = new Regex(@"^\s*[#;](.*)");
 
-		private readonly Regex _property = new Regex(@"^\s*([\w\.\-_]+)\s*[=:]\s*(.*?)\s*([#;].*)?$");
+		public static readonly Regex PropertyRegex = new Regex(@"^\s*([\w\.\-_]+)\s*[=:]\s*(.*?)\s*([#;].*)?$");
 
 		private readonly Dictionary<string, IniLine<IniSectionData>> _sections = new Dictionary<string, IniLine<IniSectionData>>();
 
@@ -86,7 +86,7 @@
 			return section.Properties.Select(tuple => new IniLine<IniPropertyData>(GetLineNumber(section, tuple.Offset), tuple.Prop));
 		}
 
-		public bool TryGetComment(string commentText, IniSectionData section, [NotNullWhen(true)] out IniLine<IniComment>? comment)
+		public bool TryGetComment(string commentText, IniSectionData section, [NotNullWhen(true)] out IniLine<IniCommentData>? comment)
 		{
 			if (string.IsNullOrWhiteSpace(commentText))
 			{
@@ -106,7 +106,7 @@
 
 			var lineNumber = GetLineNumber(section, offset);
 
-			comment = new IniLine<IniComment>(lineNumber, commentData);
+			comment = new IniLine<IniCommentData>(lineNumber, commentData);
 			return true;
 		}
 
@@ -150,12 +150,12 @@
 			{
 				try
 				{
-					var matches = _comment.Matches(line);
+					var matches = CommentRegex.Matches(line);
 
 					if (matches.Count > 0)
 					{
 						var text = matches[0].Groups[1].Value.Trim();
-						IniComment iniComment = new IniComment(text);
+						IniCommentData iniComment = new IniCommentData(text);
 
 						// We will discard any comments from before the first section
 						activeSection.AddLine(iniComment);
@@ -163,23 +163,20 @@
 						continue;
 					}
 
-					matches = _property.Matches(line);
+					matches = PropertyRegex.Matches(line);
 					if (matches.Count > 0)
 					{
-						var key = matches[0].Groups[1].Value.Trim();
-						var value = matches[0].Groups[2].Value.Trim();
-
-						var prop = new IniPropertyData(key, value);
+						var prop = new IniPropertyData(line);
 
 						activeSection.AddLine(prop);
 						continue;
 					}
 
-					matches = _section.Matches(line);
+					matches = SectionRegex.Matches(line);
 					if (matches.Count > 0)
 					{
 						var sectionName = matches[0].Groups[1].Value;
-						activeSection = new IniSectionData(sectionName);
+						activeSection = IniSectionData.FromLine(line);
 
 						var iniSection = new IniLine<IniSectionData>(currentLineNumber, activeSection);
 

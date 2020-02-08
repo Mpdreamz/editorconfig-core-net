@@ -1,18 +1,38 @@
-﻿namespace EditorConfig.Core
+﻿using System.Text.RegularExpressions;
+
+namespace EditorConfig.Core
 {
-	public class IniComment : IniLineData
+	public class IniCommentData : IniLineData
 	{
-		public IniComment(string text) : base(IniLineType.Comment)
+		public IniCommentData(string text) : this(text, false)
 		{
-			Text = text;
 		}
+
+		private IniCommentData(string textOrLine, bool isLine) : base(IniLineType.Comment, isLine ? textOrLine : null)
+		{
+			if (string.IsNullOrWhiteSpace(textOrLine))
+			{
+				throw new System.ArgumentException("message", nameof(textOrLine));
+			}
+
+			if (isLine)
+			{
+				var matches = LineRegex.Matches(textOrLine);
+				Text = matches[0].Groups[1].Value.Trim();
+			}
+			else
+			{
+				Text = textOrLine;
+			}
+		}
+
+		public static IniCommentData FromLine(string line) => new IniCommentData(line, true);
 
 		public string Text { get; }
 
+		public override Regex LineRegex => EditorConfigFile.CommentRegex;
+
 		/// <inheritdoc />
-		public override string ToString()
-		{
-			return $"# {Text}";
-		}
+		protected override string ToLine() => $"# {Text}";
 	}
 }
