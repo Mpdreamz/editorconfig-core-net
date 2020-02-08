@@ -71,9 +71,9 @@
 
 		public IReadOnlyList<IniSectionData> Sections => _sections.Values.Select(s => s.Data).ToList();
 
-		public EditContext Edit()
+		public EditContext Edit(bool allowConsecutiveEmptyLines = false)
 		{
-			return new EditContext(this);
+			return new EditContext(this, allowConsecutiveEmptyLines);
 		}
 
 		public IEnumerable<IniLine<IniPropertyData>> GetSectionProperties(IniSectionData section)
@@ -216,14 +216,15 @@
 		public class EditContext : IDisposable
 		{
 			private readonly EditorConfigFile _editorConfigFile;
-
+			private readonly bool _allowConsecutiveEmptyLines;
 			private FileStream _lock;
 
 			private readonly List<string> _lines;
 
-			public EditContext(EditorConfigFile editorConfigFile)
+			public EditContext(EditorConfigFile editorConfigFile, bool allowConsecutiveEmptyLines = false)
 			{
 				_editorConfigFile = editorConfigFile ?? throw new ArgumentNullException(nameof(editorConfigFile));
+				_allowConsecutiveEmptyLines = allowConsecutiveEmptyLines;
 				_lock = CreateLock();
 
 				// Make a copy of the data for editing
@@ -274,14 +275,14 @@
 
 				foreach (var line in Global)
 				{
-					_lines.Add(line.ToString());
+					WriteLine(line);
 				}
 
 				foreach (var section in Sections.Values)
 				{
 					foreach (var line in section)
 					{
-						_lines.Add(line.ToString());
+						WriteLine(line);
 					}
 				}
 
@@ -297,6 +298,16 @@
 
 				// Replace the file class' data if the operation is successful
 				_editorConfigFile.ResetTo(_lines);
+			}
+
+			private void WriteLine(IniLineData line)
+			{
+				if (!_allowConsecutiveEmptyLines && line.LineType == IniLineType.None && string.IsNullOrWhiteSpace(_lines.Last()))
+				{
+					return;
+				}
+
+				_lines.Add(line.ToString());
 			}
 
 			protected virtual void Dispose(bool disposing)
