@@ -279,6 +279,8 @@
 					WriteLine(line);
 				}
 
+				int numSections = Sections.Count;
+				int count = 0;
 				foreach (var section in Sections.Values)
 				{
 					IniLineData? lastLine = null;
@@ -289,12 +291,18 @@
 					}
 
 					// Ensure sections end with a comment or a blank line
+					// Except for the final section
 					IniLineType? lineType = lastLine?.LineType;
 
-					if (_options.EndSectionWithBlankLineOrComment && lineType != IniLineType.Comment && lineType != IniLineType.None)
+					if (_options.EndSectionWithBlankLineOrComment
+						&& count < numSections - 1
+						&& lineType != IniLineType.Comment
+						&& lineType != IniLineType.None)
 					{
 						WriteLine(new IniEmptyLine());
 					}
+
+					count++;
 				}
 
 				_lock.Dispose();
