@@ -154,8 +154,7 @@
 
 					if (matches.Count > 0)
 					{
-						var text = matches[0].Groups[1].Value.Trim();
-						IniCommentData iniComment = new IniCommentData(text);
+						IniCommentData iniComment = IniCommentData.FromLine(line);
 
 						// We will discard any comments from before the first section
 						activeSection.AddLine(iniComment);
