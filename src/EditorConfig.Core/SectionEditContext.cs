@@ -2,8 +2,9 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Security.Principal;
 
-	public class SectionEditContext : IniSectionData
+	public class SectionEditContext : IniSectionData, IList<IniLineData>
 	{
 		public SectionEditContext(IniSectionData section) : base(section)
 		{
@@ -13,6 +14,14 @@
 		public IniSectionData Section { get; }
 
 		public int Count => Lines.Count;
+
+		public bool IsReadOnly => false;
+
+		public IniLineData this[int index]
+		{
+			get => Lines[index];
+			set => Lines[index] = value;
+		}
 
 		public void AddRange(IEnumerable<IniLineData> items) => Lines.AddRange(items);
 
@@ -50,5 +59,7 @@
 		}
 
 		public void RemoveAt(int index) => Lines.RemoveAt(index);
+
+		public bool Remove(IniLineData item) => Lines.Remove(item);
 	}
 }
