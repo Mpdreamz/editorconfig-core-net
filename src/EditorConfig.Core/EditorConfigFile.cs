@@ -305,6 +305,15 @@
 					count++;
 				}
 
+				// If the final line is an empty line, remove it
+				if (_options.TrimEmptyLineFromEndOfFile)
+				{
+					while (_lines.Count > 1 && string.IsNullOrWhiteSpace(_lines[_lines.Count - 1]))
+					{
+						_lines.RemoveAt(_lines.Count - 1);
+					}
+				}
+
 				_lock.Dispose();
 				try
 				{

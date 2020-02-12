@@ -5,5 +5,7 @@
 		public bool AllowConsecutiveEmptyLines { get; set; }
 
 		public bool EndSectionWithBlankLineOrComment { get; set; } = true;
+
+		public bool TrimEmptyLineFromEndOfFile { get; set; } = true;
 	}
 }

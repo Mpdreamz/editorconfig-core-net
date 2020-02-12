@@ -132,7 +132,8 @@
 			var fileLength = File.ReadAllLines(file).Length;
 			var workingFileLength = File.ReadAllLines(workingFile).Length;
 
-			workingFileLength.Should().Be(fileLength - sectionLength);
+			// The final line would have been an empty line, which gets removed
+			workingFileLength.Should().Be(fileLength - sectionLength - 1);
 		}
 
 		[Test]
